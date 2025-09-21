@@ -33,10 +33,10 @@ type IsPlaylistVideo struct {
 	*is.Processor
 }
 
-func (s *IsPlaylistVideo) New(pageP *rod.Page, urlStr string, scrollMax int) *IsPlaylistVideo {
+func (s *IsPlaylistVideo) New(page *rod.Page, urlStr string, scrollMax int) *IsPlaylistVideo {
 	property := is.Property{
 		IInfoList: new(is.IInfoList),
-		Page:      pageP,
+		Page:      page,
 		ScrollMax: scrollMax,
 		UrlLoad:   true,
 		UrlStr:    urlStr,
@@ -44,12 +44,12 @@ func (s *IsPlaylistVideo) New(pageP *rod.Page, urlStr string, scrollMax int) *Is
 	s.Processor = is.New(&property) // Init the base struct
 	s.MyType = "IsVideoList"
 
-	s.initFunc()
+	s.override()
 
 	return s
 }
 
-func (s *IsPlaylistVideo) initFunc() {
+func (s *IsPlaylistVideo) override() {
 	s.V010_Container = func() *rod.Element {
 		prefix := s.MyType + ".V010_ElementsContainer"
 		ezlog.Trace(prefix + ": Start")

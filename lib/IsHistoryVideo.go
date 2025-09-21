@@ -52,12 +52,12 @@ func (s *IsHistoryVideo) New(property *is.Property, del bool, remove bool, filte
 	s.Filter = append(s.Filter, *filter...)
 	s.Del = del
 	s.Remove = remove
-	s.initFunc()
+	s.override()
 
 	return s
 }
 
-func (s *IsHistoryVideo) initFunc() {
+func (s *IsHistoryVideo) override() {
 	s.V020_Elements = func(element *rod.Element) *rod.Elements {
 		prefix := s.MyType + ".V020_Elements"
 		ezlog.Trace(prefix + ": Start")

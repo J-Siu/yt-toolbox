@@ -31,10 +31,10 @@ type IsSubChannel struct {
 	*is.Processor
 }
 
-func (s *IsSubChannel) New(pageP *rod.Page, urlStr string, scrollMax int) *IsSubChannel {
+func (s *IsSubChannel) New(page *rod.Page, urlStr string, scrollMax int) *IsSubChannel {
 	property := is.Property{
 		IInfoList: new(is.IInfoList),
-		Page:      pageP,
+		Page:      page,
 		ScrollMax: scrollMax,
 		UrlLoad:   true,
 		UrlStr:    urlStr,
@@ -42,11 +42,11 @@ func (s *IsSubChannel) New(pageP *rod.Page, urlStr string, scrollMax int) *IsSub
 	s.Processor = is.New(&property) // Init the base struct
 	s.MyType = "IsSubscription"
 
-	s.initFunc()
+	s.override()
 	return s
 }
 
-func (s *IsSubChannel) initFunc() {
+func (s *IsSubChannel) override() {
 	s.V020_Elements = func(element *rod.Element) *rod.Elements {
 		prefix := s.MyType + ".V020_Elements"
 		ezlog.Trace(prefix + ": Start")

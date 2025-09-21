@@ -42,10 +42,10 @@ type IsHistorySection struct {
 	Filter      []string
 }
 
-func (s *IsHistorySection) New(pageP *rod.Page, urlStr string, remove bool, scrollMax int, verbose bool) *IsHistorySection {
+func (s *IsHistorySection) New(page *rod.Page, urlStr string, remove bool, scrollMax int, verbose bool) *IsHistorySection {
 	property := is.Property{
 		IInfoList: new(is.IInfoList),
-		Page:      pageP,
+		Page:      page,
 		ScrollMax: scrollMax,
 		UrlLoad:   true,
 		UrlStr:    urlStr,
@@ -55,12 +55,12 @@ func (s *IsHistorySection) New(pageP *rod.Page, urlStr string, remove bool, scro
 
 	s.Remove = remove
 	s.Verbose = verbose
-	s.initFunc()
+	s.override()
 
 	return s
 }
 
-func (s *IsHistorySection) initFunc() {
+func (s *IsHistorySection) override() {
 	s.V020_Elements = func(element *rod.Element) *rod.Elements {
 		prefix := s.MyType + ".V020_Elements"
 		ezlog.Trace(prefix + ": Start")

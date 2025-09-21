@@ -36,10 +36,10 @@ type IsPlaylist struct {
 	Include *[]string `json:"Include"`
 }
 
-func (s *IsPlaylist) New(pageP *rod.Page, urlStr string, scrollMax int, exclude *[]string, include *[]string) *IsPlaylist {
+func (s *IsPlaylist) New(page *rod.Page, urlStr string, scrollMax int, exclude *[]string, include *[]string) *IsPlaylist {
 	property := is.Property{
 		IInfoList: new(is.IInfoList),
-		Page:      pageP,
+		Page:      page,
 		ScrollMax: scrollMax,
 		UrlLoad:   true,
 		UrlStr:    urlStr,
@@ -55,12 +55,12 @@ func (s *IsPlaylist) New(pageP *rod.Page, urlStr string, scrollMax int, exclude 
 
 	ezlog.Debug(prefix)
 	ezlog.DebugP(MustToJsonStrP(s))
-	s.initFunc()
+	s.override()
 
 	return s
 }
 
-func (s *IsPlaylist) initFunc() {
+func (s *IsPlaylist) override() {
 	s.V010_Container = func() *rod.Element {
 		prefix := s.MyType + ".V010_ElementsContainer"
 		ezlog.Trace(prefix + ": Start")

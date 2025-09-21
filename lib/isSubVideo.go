@@ -35,10 +35,10 @@ type IsSubVideo struct {
 	Day int
 }
 
-func (s *IsSubVideo) New(pageP *rod.Page, urlStr string, scrollMax int) *IsSubVideo {
+func (s *IsSubVideo) New(page *rod.Page, urlStr string, scrollMax int) *IsSubVideo {
 	property := is.Property{
 		IInfoList: new(is.IInfoList),
-		Page:      pageP,
+		Page:      page,
 		ScrollMax: scrollMax,
 		UrlLoad:   true,
 		UrlStr:    urlStr,
@@ -47,13 +47,13 @@ func (s *IsSubVideo) New(pageP *rod.Page, urlStr string, scrollMax int) *IsSubVi
 	s.MyType = "IsSubscription"
 	prefix := s.MyType + ".New"
 
-	s.initFunc()
+	s.override()
 
 	ezlog.Trace(prefix + ": Done")
 	return s
 }
 
-func (s *IsSubVideo) initFunc() {
+func (s *IsSubVideo) override() {
 	s.V020_Elements = func(element *rod.Element) *rod.Elements {
 		prefix := s.MyType + ".V020_Elements"
 		ezlog.Trace(prefix + ": Start")
