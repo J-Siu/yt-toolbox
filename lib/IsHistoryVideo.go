@@ -36,7 +36,7 @@ type IsHistoryVideo struct {
 
 	ClickSleep  float64 // in second
 	Del         bool    // false;
-	Deleted     bool    // false;
+	Deleted     bool    // In Run(), elements loop, current element is deleted or not
 	Desc        bool    // false;
 	PrintHeader bool    // true;
 	Remove      bool    // false;
@@ -201,6 +201,7 @@ func (s *IsHistoryVideo) override() {
 	}
 
 }
+
 func (s *IsHistoryVideo) V021_ElementsRemoveShorts(element *rod.Element) *IsHistoryVideo {
 	prefix := s.MyType + ".V020_ElementsRemoveShorts"
 	ezlog.Trace(prefix + ": Start")
