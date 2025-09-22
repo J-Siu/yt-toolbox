@@ -1,8 +1,21 @@
 # YT Toolbox
 
+A command line program to extract youtube subscriptions, playlist and history. Using [go-is](https://github.com/J-Siu/go-is) and [rod](https://github.com/go-rod/rod).
+
 ### Limitation
 
-- Chrome/Chromium must be started manually or from script
+> Must use remote browser as function require youtube login.
+
+1. Close running Chrome. Start Chrome with following option:
+
+    ```sh
+    chrome --remote-debugging-port=9222
+    ```
+
+    Or Chromium with the same option.
+
+2. Login youtube.com
+3. Run yt-toolbox
 
 ### Usage
 
@@ -36,5 +49,5 @@ Flags:
   -v, --verbose               Verbose
       --version               version for go-yt-toolbox
 
-Use "go-yt-toolbox [command] --help" for more information about a command.
+Use "yt-toolbox [command] --help" for more information about a command.
 ```

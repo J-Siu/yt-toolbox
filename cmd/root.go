@@ -31,7 +31,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "go-yt-toolbox",
+	Use:     "yt-toolbox",
 	Aliases: []string{"gyt"},
 	Short:   "YouTube toolbox",
 	Version: global.Version,
