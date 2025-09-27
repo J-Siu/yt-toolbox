@@ -22,9 +22,7 @@ THE SOFTWARE.
 package lib
 
 import (
-	"strconv"
-
-	"github.com/J-Siu/go-ezlog"
+	"github.com/J-Siu/go-ezlog/v2"
 	"github.com/J-Siu/go-is"
 	"github.com/go-rod/rod"
 )
@@ -49,28 +47,29 @@ func (s *IsSubVideo) New(page *rod.Page, urlStr string, scrollMax int) *IsSubVid
 
 	s.override()
 
-	ezlog.Trace(prefix + ": Done")
+	ezlog.Trace().Name(prefix).Msg("Done")
 	return s
 }
 
 func (s *IsSubVideo) override() {
 	s.V020_Elements = func(element *rod.Element) *rod.Elements {
 		prefix := s.MyType + ".V020_Elements"
-		ezlog.Trace(prefix + ": Start")
+		ezlog.Trace().Name(prefix).Msg("Start").Out()
 
 		var elements rod.Elements
 		tagName := "ytd-rich-item-renderer"
 		s.Page.MustElement(tagName)
 		elements = s.Page.MustElements(tagName)
-		ezlog.Debug(prefix + ": es count: " + strconv.Itoa(len(elements)))
-		ezlog.Trace(prefix + ": End")
+		ezlog.Debug().Name(prefix).Name("elements count").Msg(len(elements)).Out()
+
+		ezlog.Trace().Name(prefix).Msg("End").Out()
 		return &elements
 	}
 
 	// [element] : "ytd-rich-item-renderer" element from V20_elements()
 	s.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
 		prefix := s.MyType + ".V030_ElementInfo"
-		ezlog.Trace(prefix + ": Start")
+		ezlog.Trace().Name(prefix).Msg("Start").Out()
 
 		if element != nil {
 			var info YT_Info
@@ -105,18 +104,17 @@ func (s *IsSubVideo) override() {
 			if err != nil {
 				info.Text = "Short" // These are shorts with not meta block
 
-				if ezlog.LogLevel() == ezlog.TraceLevel {
-					ezlog.Trace(prefix + ": err: element")
-					ezlog.Trace(element.MustHTML())
+				if ezlog.GetLogLevel() == ezlog.TraceLevel {
+					ezlog.Trace().Name(prefix).NameLn("Err element").Msg(element.MustHTML()).Out()
 				}
 			}
 			// ---
 
 			// ---
-			ezlog.Debug(prefix + info.String())
+			ezlog.Debug().Name(prefix).Msg(info.String()).Out()
 			infoP = &info
 		}
-		ezlog.Trace(prefix + ": End")
+		ezlog.Trace().Name(prefix).Msg("End").Out()
 		return infoP
 	}
 }

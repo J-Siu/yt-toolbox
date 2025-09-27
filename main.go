@@ -22,12 +22,12 @@ THE SOFTWARE.
 package main
 
 import (
-	"github.com/J-Siu/go-ezlog"
+	"github.com/J-Siu/go-ezlog/v2"
 	"github.com/J-Siu/yt-toolbox/cmd"
 )
 
 func main() {
-	ezlog.SetAllPrintln()
+	ezlog.StrAny.IndentEnable(true)
 	ezlog.SetLogLevel(ezlog.ErrLevel)
 	cmd.Execute()
 }

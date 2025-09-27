@@ -22,9 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/J-Siu/go-ezlog"
+	"github.com/J-Siu/go-ezlog/v2"
 	"github.com/J-Siu/yt-toolbox/global"
-	"github.com/J-Siu/yt-toolbox/lib"
 	"github.com/spf13/cobra"
 )
 
@@ -34,8 +33,10 @@ var configCmd = &cobra.Command{
 	Aliases: []string{"c", "conf"},
 	Short:   "Print configurations",
 	Run: func(cmd *cobra.Command, args []string) {
-		ezlog.Msg("Config:")
-		ezlog.MsgP(lib.MustToJsonStrP(&global.Conf))
+		ezlog.Log().
+			MsgLn("Config:").
+			Msg(&global.Conf).
+			Out()
 	},
 }
 

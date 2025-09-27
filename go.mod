@@ -3,9 +3,9 @@ module github.com/J-Siu/yt-toolbox
 go 1.25.1
 
 require (
-	github.com/J-Siu/go-basestruct v1.0.0
-	github.com/J-Siu/go-ezlog v1.0.0
-	github.com/J-Siu/go-is v1.0.0
+	github.com/J-Siu/go-dtquery v0.0.3
+	github.com/J-Siu/go-ezlog/v2 v2.1.3
+	github.com/J-Siu/go-is v1.1.0
 	github.com/charlievieth/strcase v0.0.5
 	github.com/go-rod/rod v0.116.2
 	github.com/spf13/cobra v1.10.1
@@ -13,6 +13,8 @@ require (
 )
 
 require (
+	github.com/J-Siu/go-basestruct v1.1.0 // indirect
+	github.com/J-Siu/go-strany v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

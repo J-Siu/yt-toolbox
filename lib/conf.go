@@ -25,7 +25,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/J-Siu/go-ezlog"
+	"github.com/J-Siu/go-ezlog/v2"
 	"github.com/spf13/viper"
 )
 
@@ -55,18 +55,15 @@ func (c *TypeConf) New() {
 	prefix := c.myType + ".New"
 
 	c.setDefault()
-	ezlog.Debug(prefix + ": Default:")
-	ezlog.DebugP(MustToJsonStrP(c))
+	ezlog.Debug().MsgLn(prefix + ": Default:").Msg(c).Out()
 
 	c.readFileConf()
-	ezlog.Debug(prefix + ": Raw:")
-	ezlog.DebugP(MustToJsonStrP(c))
+	ezlog.Debug().MsgLn(prefix + ": Raw:").Msg(c).Out()
 
 	// TODO: add flag
 
 	c.expand()
-	ezlog.Debug(prefix + ": Expand:")
-	ezlog.DebugP(MustToJsonStrP(c))
+	ezlog.Debug().MsgLn(prefix + ": Expand:").Msg(c).Out()
 }
 
 func (c *TypeConf) readFileConf() {
@@ -80,7 +77,9 @@ func (c *TypeConf) readFileConf() {
 	if c.Err == nil {
 		c.Err = viper.Unmarshal(&c)
 	} else {
-		ezlog.Debug(prefix + ": Config file: " + c.Err.Error())
+		ezlog.Debug().
+			Name(prefix).Msg("Config file: " + c.Err.Error()).
+			Out()
 	}
 }
 

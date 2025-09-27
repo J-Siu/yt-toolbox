@@ -24,7 +24,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/J-Siu/go-ezlog"
+	"github.com/J-Siu/go-ezlog/v2"
 	"github.com/J-Siu/yt-toolbox/global"
 	"github.com/J-Siu/yt-toolbox/lib"
 	"github.com/spf13/cobra"
@@ -42,9 +42,11 @@ var rootCmd = &cobra.Command{
 		if global.Flag.Trace {
 			ezlog.SetLogLevel(ezlog.TraceLevel)
 		}
-		ezlog.Debug("Version: " + global.Version)
-		ezlog.Debug("Flag:")
-		ezlog.DebugP(lib.MustToJsonStrP(&global.Flag))
+		ezlog.Debug().
+			Name("Version").MsgLn("global.Version").
+			MsgLn("Flag:").
+			MsgLn(&global.Flag).
+			Out()
 		global.Conf.New()
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {},

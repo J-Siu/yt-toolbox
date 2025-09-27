@@ -22,9 +22,7 @@ THE SOFTWARE.
 package lib
 
 import (
-	"strconv"
-
-	"github.com/J-Siu/go-ezlog"
+	"github.com/J-Siu/go-ezlog/v2"
 	"github.com/J-Siu/go-is"
 	"github.com/go-rod/rod"
 )
@@ -52,28 +50,28 @@ func (s *IsPlaylistVideo) New(page *rod.Page, urlStr string, scrollMax int) *IsP
 func (s *IsPlaylistVideo) override() {
 	s.V010_Container = func() *rod.Element {
 		prefix := s.MyType + ".V010_ElementsContainer"
-		ezlog.Trace(prefix + ": Start")
+		ezlog.Trace().Name(prefix).Msg("Start").Out()
 		tagName := "ytd-playlist-video-list-renderer"
-		e := s.Page.MustElement(tagName)
-		ezlog.Debug(prefix + ": " + tagName + ":")
-		ezlog.DebugP(MustToJsonStrP(e))
-		ezlog.Trace(prefix + ": End")
-		return e
+		element := s.Page.MustElement(tagName)
+		ezlog.Debug().Name(prefix).NameLn(tagName).Msg(element).Out()
+
+		ezlog.Trace().Name(prefix).Msg("End").Out()
+		return element
 	}
 
 	s.V020_Elements = func(element *rod.Element) *rod.Elements {
 		prefix := s.MyType + ".V020_Elements"
-		ezlog.Trace(prefix + ": Start")
+		ezlog.Trace().Name(prefix).Msg("Start").Out()
 		tagName := "ytd-playlist-video-renderer"
 		es := element.MustElements(tagName)
-		ezlog.Debug(prefix + ": " + tagName + " count: " + strconv.Itoa(len(es)))
-		ezlog.Trace(prefix + ": End")
+		ezlog.Debug().Name(prefix).Name(tagName).Name("count").Msg(len(es)).Out()
+		ezlog.Trace().Name(prefix).Msg("End").Out()
 		return &es
 	}
 
 	s.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
 		prefix := s.MyType + ".V030_ElementInfo"
-		ezlog.Trace(prefix + ": Start")
+		ezlog.Trace().Name(prefix).Msg("Start").Out()
 		if element != nil {
 			var info YT_Info
 			e := element.MustElement("#video-title")
@@ -81,7 +79,7 @@ func (s *IsPlaylistVideo) override() {
 			info.Url = *e.MustAttribute("href")
 			infoP = &info
 		}
-		ezlog.Trace(prefix + ": End")
+		ezlog.Trace().Name(prefix).Msg("End").Out()
 		return infoP
 	}
 }

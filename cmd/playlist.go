@@ -22,7 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/J-Siu/go-ezlog"
+	"github.com/J-Siu/go-ezlog/v2"
 	"github.com/J-Siu/go-is"
 	"github.com/J-Siu/yt-toolbox/global"
 	"github.com/J-Siu/yt-toolbox/lib"
@@ -48,7 +48,7 @@ var playlistCmd = &cobra.Command{
 			Run()
 
 		if isPlaylist.Err == nil {
-			ezlog.Msg("Playlist:")
+			ezlog.Log().Msg("Playlist:").Out()
 			isPlaylist.IInfoList.Print(is.PrintMatched)
 			if global.FlagPlaylist.GetList {
 				for _, info := range *isPlaylist.IInfoList {
@@ -79,6 +79,6 @@ func processVideoList(iinfo is.IInfo, page *rod.Page) {
 			info.Url,
 			global.Flag.ScrollMax).
 		Run()
-	ezlog.Msg(info.Title)
+	ezlog.Log().Msg(info.Title).Out()
 	isVideoList.IInfoList.Print(is.PrintAll)
 }

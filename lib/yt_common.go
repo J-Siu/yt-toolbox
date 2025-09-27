@@ -22,10 +22,10 @@ THE SOFTWARE.
 package lib
 
 import (
-	"encoding/json"
 	"net/url"
 
-	"github.com/J-Siu/go-ezlog"
+	"github.com/J-Siu/go-dtquery/dq"
+	"github.com/J-Siu/go-ezlog/v2"
 	"github.com/charlievieth/strcase"
 	"github.com/go-rod/rod"
 )
@@ -72,29 +72,16 @@ func MustStrMatchList(str string, subStrings *[]string) (result bool) {
 	return result
 }
 
-func MustToJsonStrP(obj any) *string {
-	prefix := "MustToJsonStrP"
-	var str string
-	b, err := json.MarshalIndent(obj, "", "  ")
-	if err != nil {
-		str = "{<MustToJsonStrP() failed>}"
-		ezlog.Trace(prefix + ": Err: " + err.Error())
-	} else {
-		str = string(b)
-	}
-	return &str
-}
-
 func GetTab(host string, port int) *rod.Page {
 	prefix := "GetTab"
-	ezlog.Trace(prefix + ": Start")
+	ezlog.Trace().Name(prefix).Msg("Start").Out()
 	var (
 		browser *rod.Browser
 		err     error
 		page    *rod.Page
 		pages   rod.Pages
 	)
-	devtools := new(Devtools).New(host, port)
+	devtools := dq.Get(host, port)
 	err = devtools.Err
 	if err == nil {
 		browser = rod.New().ControlURL(devtools.Ver.WsUrl)
@@ -111,8 +98,8 @@ func GetTab(host string, port int) *rod.Page {
 	}
 
 	if err != nil {
-		ezlog.Err(prefix + ": Err:" + err.Error())
+		ezlog.Err().Name(prefix).Name("Err").Msg(err)
 	}
-	ezlog.Trace(prefix + ": End")
+	ezlog.Trace().Name(prefix).Msg("End").Out()
 	return page
 }

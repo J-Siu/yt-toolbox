@@ -22,9 +22,7 @@ THE SOFTWARE.
 package lib
 
 import (
-	"strconv"
-
-	"github.com/J-Siu/go-ezlog"
+	"github.com/J-Siu/go-ezlog/v2"
 	"github.com/J-Siu/go-is"
 	"github.com/go-rod/rod"
 )
@@ -48,13 +46,12 @@ func (s *IsPlaylist) New(page *rod.Page, urlStr string, scrollMax int, exclude *
 	s.MyType = "IsPlaylist"
 	prefix := s.MyType + ".New"
 	if s.Err != nil {
-		ezlog.Debug(prefix + ": Err: " + s.Err.Error())
+		ezlog.Debug().Name(prefix).Name("Err").Msg(s.Err).Out()
 	}
 	s.Exclude = exclude
 	s.Include = include
 
-	ezlog.Debug(prefix)
-	ezlog.DebugP(MustToJsonStrP(s))
+	ezlog.Debug().NameLn(prefix).Msg(s).Out()
 	s.override()
 
 	return s
@@ -63,49 +60,47 @@ func (s *IsPlaylist) New(page *rod.Page, urlStr string, scrollMax int, exclude *
 func (s *IsPlaylist) override() {
 	s.V010_Container = func() *rod.Element {
 		prefix := s.MyType + ".V010_ElementsContainer"
-		ezlog.Trace(prefix + ": Start")
+		ezlog.Trace().Name(prefix).Msg("Start").Out()
 		byId := "#contents"
 		e := s.Page.MustElement(byId) // by id
-		if ezlog.LogLevel() == ezlog.TraceLevel {
-			ezlog.Trace(prefix + ": " + byId)
-			ezlog.Trace(e.MustHTML())
+		if ezlog.GetLogLevel() == ezlog.TraceLevel {
+			ezlog.Trace().Name(prefix).MsgLn(byId).Msg(e.MustHTML()).Out()
 		}
-		ezlog.Trace(prefix + ": End")
+		ezlog.Trace().Name(prefix).Msg("End").Out()
 		return e
 	}
 
 	s.V020_Elements = func(element *rod.Element) *rod.Elements {
 		prefix := s.MyType + ".V020_Elements"
-		ezlog.Trace(prefix + ": Start")
+		ezlog.Trace().Name(prefix).Msg("Start").Out()
 		tagName := "ytd-rich-item-renderer"
-		es := element.MustElements(tagName)
-		ezlog.Debug(prefix + ": " + tagName + " count:" + strconv.Itoa(len(es)))
-		ezlog.Trace(prefix + ": End")
-		return &es
+		elements := element.MustElements(tagName)
+		ezlog.Debug().Name(prefix).Name(tagName).Name("element count").Msg(len(elements)).Out()
+
+		ezlog.Trace().Name(prefix).Msg("End").Out()
+		return &elements
 	}
 
 	s.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
 		prefix := s.MyType + ".V030_ElementInfo"
-		ezlog.Trace(prefix + ": Start")
+		ezlog.Trace().Name(prefix).Msg("Start").Out()
 
 		if element != nil {
 			var info YT_Info
-			if ezlog.LogLevel() == ezlog.TraceLevel {
-				ezlog.Trace(prefix + ": element:")
-				ezlog.Trace(element.MustHTML())
+			if ezlog.GetLogLevel() == ezlog.TraceLevel {
+				ezlog.Trace().Name(prefix).NameLn("element").Msg(element.MustHTML()).Out()
 			}
 			h3 := element.MustElement("h3")
 			if h3 != nil {
 				info.Title = *(h3.MustAttribute("title"))
-				ezlog.Debug(prefix + ": Title: " + info.Title)
+				ezlog.Debug().Name(prefix).Name("Title").Msg(info.Title).Out()
 			}
 			tagName := "a"
 			es := element.MustElements(tagName)
 			for _, s := range es {
 				if s.MustText() == "View full playlist" {
-					if ezlog.LogLevel() == ezlog.TraceLevel {
-						ezlog.Trace(prefix + ": " + tagName + ":")
-						ezlog.Trace(s.MustHTML())
+					if ezlog.GetLogLevel() == ezlog.TraceLevel {
+						ezlog.Trace().Name(prefix).NameLn(tagName).Msg(s.MustHTML()).Out()
 					}
 					info.Url = UrlYT.Base + *(s.MustAttribute("href"))
 				}
@@ -113,7 +108,7 @@ func (s *IsPlaylist) override() {
 			infoP = &info
 		}
 
-		ezlog.Trace(prefix + ": End")
+		ezlog.Trace().Name(prefix).Msg("End").Out()
 		return infoP
 	}
 
@@ -131,7 +126,7 @@ func (s *IsPlaylist) override() {
 				matched = false
 			}
 		}
-		ezlog.Trace(prefix + ": matched: " + strconv.FormatBool(matched) + " matchedStr: " + matchedStr)
+		ezlog.Trace().Name(prefix).Name("matched").Msg(matched).Name("matchedStr").Msg(matchedStr).Out()
 		return matched, matchedStr
 	}
 }

@@ -22,7 +22,7 @@ THE SOFTWARE.
 package lib
 
 import (
-	"github.com/J-Siu/go-ezlog"
+	"github.com/J-Siu/go-ezlog/v2"
 	"github.com/J-Siu/go-is"
 	"github.com/go-rod/rod"
 )
@@ -49,19 +49,19 @@ func (s *IsSubChannel) New(page *rod.Page, urlStr string, scrollMax int) *IsSubC
 func (s *IsSubChannel) override() {
 	s.V020_Elements = func(element *rod.Element) *rod.Elements {
 		prefix := s.MyType + ".V020_Elements"
-		ezlog.Trace(prefix + ": Start")
+		ezlog.Trace().Name(prefix).Msg("Start").Out()
 
 		var elements rod.Elements
 		s.Page.MustElement("#content-section").MustWaitVisible()
 		elements = s.Page.MustElements("#content-section")
 
-		ezlog.Trace(prefix + ": End")
+		ezlog.Trace().Name(prefix).Msg("End").Out()
 		return &elements
 	}
 
 	s.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
 		prefix := s.MyType + ".V030_ElementInfo"
-		ezlog.Trace(prefix + ": Start")
+		ezlog.Trace().Name(prefix).Msg("Start").Out()
 
 		if element != nil {
 			var info YT_Info
@@ -71,10 +71,10 @@ func (s *IsSubChannel) override() {
 			urlPath = element.MustElement("#main-link").MustAttribute("href")
 			info.Title = title
 			info.Url = UrlYT.Base + *urlPath
-			ezlog.Debug(prefix + info.String())
+			ezlog.Debug().Name(prefix).Msg(info.String()).Out()
 			infoP = &info
 		}
-		ezlog.Trace(prefix + ": End")
+		ezlog.Trace().Name(prefix).Msg("End").Out()
 		return infoP
 	}
 }
