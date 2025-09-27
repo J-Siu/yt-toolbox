@@ -27,7 +27,6 @@ import (
 )
 
 func main() {
-	ezlog.StrAny.IndentEnable(true)
 	ezlog.SetLogLevel(ezlog.ErrLevel)
 	cmd.Execute()
 }

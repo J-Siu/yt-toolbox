@@ -42,7 +42,7 @@ func (s *IsSubVideo) New(page *rod.Page, urlStr string, scrollMax int) *IsSubVid
 		UrlStr:    urlStr,
 	}
 	s.Processor = is.New(&property) // Init the base struct
-	s.MyType = "IsSubscription"
+	s.MyType = "IsSubVideo"
 	prefix := s.MyType + ".New"
 
 	s.override()
@@ -72,15 +72,17 @@ func (s *IsSubVideo) override() {
 		ezlog.Trace().Name(prefix).Msg("Start").Out()
 
 		if element != nil {
-			var info YT_Info
-
+			var (
+				info    YT_Info
+				tagName string
+			)
 			// Tile block("h3"): title and link of the video
 			eH3 := element.MustElement("h3")
 			info.Title = eH3.MustText()
 			info.Url = UrlYT.Base + *eH3.MustElement("a").MustAttribute("href")
 
 			// Meta element: channel info, views and date
-			tagName := "yt-content-metadata-view-model"
+			tagName = "yt-content-metadata-view-model"
 			eMeta, err := element.Element(tagName)
 			if err == nil && eMeta != nil {
 				// Meta element -> link(<a>) block
@@ -89,7 +91,8 @@ func (s *IsSubVideo) override() {
 				info.ChUrlShort = UrlDecode(*a.MustAttribute("href"))
 				info.ChUrl = UrlYT.Base + info.ChUrlShort
 				// Meta element -> elements with [role]='text' attribute
-				eRoles, err := eMeta.Elements("[role='text']")
+				tagName = "[role='text']"
+				eRoles, err := eMeta.Elements(tagName)
 				if err == nil {
 					excludeText := []string{"views", "watch", "scheduled"}
 					for _, eRole := range eRoles {
@@ -102,16 +105,14 @@ func (s *IsSubVideo) override() {
 				}
 			}
 			if err != nil {
-				info.Text = "Short" // These are shorts with not meta block
-
-				if ezlog.GetLogLevel() == ezlog.TraceLevel {
-					ezlog.Trace().Name(prefix).NameLn("Err element").Msg(element.MustHTML()).Out()
-				}
+				// These are shorts with not meta block
+				info.Text = "Short"
+				// if ezlog.GetLogLevel() == ezlog.TraceLevel {
+				// 	ezlog.Trace().Name(prefix).NameLn("Err element").Msg(element.MustHTML()).Out()
+				// }
 			}
 			// ---
-
-			// ---
-			ezlog.Debug().Name(prefix).Msg(info.String()).Out()
+			ezlog.Debug().NameLn(prefix).Msg(info).Out()
 			infoP = &info
 		}
 		ezlog.Trace().Name(prefix).Msg("End").Out()

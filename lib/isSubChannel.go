@@ -40,7 +40,7 @@ func (s *IsSubChannel) New(page *rod.Page, urlStr string, scrollMax int) *IsSubC
 		UrlStr:    urlStr,
 	}
 	s.Processor = is.New(&property) // Init the base struct
-	s.MyType = "IsSubscription"
+	s.MyType = "IsSubChannel"
 
 	s.override()
 	return s

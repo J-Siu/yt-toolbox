@@ -22,8 +22,6 @@ THE SOFTWARE.
 package lib
 
 import (
-	"strconv"
-
 	"github.com/J-Siu/go-ezlog/v2"
 	"github.com/J-Siu/go-is"
 	"github.com/go-rod/rod"
@@ -82,16 +80,19 @@ func (s *IsHistorySection) override() {
 		ezlog.Trace().Name(prefix).Msg("Start").Out()
 
 		if element != nil {
-			var info YT_Info
-			var titles rod.Elements
-			titles, s.Err = element.Elements("#title") //by id
+			var (
+				info     YT_Info
+				elements rod.Elements
+				byId     = "#title"
+			)
+			elements, s.Err = element.Elements(byId)
 			if s.Err != nil {
 				ezlog.Err().Name(prefix).Name("Err").Msg(s.Err).Out()
 			}
 
-			for j := range len(titles) {
-				title := titles[j].MustText()
-				ezlog.Log().Ln().Name("## Section[" + strconv.Itoa(index) + "] Title[" + strconv.Itoa(j) + "]").Msg(title).Out()
+			for j, item := range elements {
+				title := item.MustText()
+				ezlog.Log().Ln().Name("## Section[").Sp(index).Sp("] Title[").Sp(j).Sp("]").Msg(title).Out()
 				info.Titles = append(info.Titles, title)
 			}
 			if len(info.Titles) == 0 {

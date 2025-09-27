@@ -55,15 +55,15 @@ func (c *TypeConf) New() {
 	prefix := c.myType + ".New"
 
 	c.setDefault()
-	ezlog.Debug().MsgLn(prefix + ": Default:").Msg(c).Out()
+	ezlog.Debug().Name(prefix).NameLn("Default").Msg(c).Out()
 
 	c.readFileConf()
-	ezlog.Debug().MsgLn(prefix + ": Raw:").Msg(c).Out()
+	ezlog.Debug().Name(prefix).NameLn("Raw").Msg(c).Out()
 
 	// TODO: add flag
 
 	c.expand()
-	ezlog.Debug().MsgLn(prefix + ": Expand:").Msg(c).Out()
+	ezlog.Debug().Name(prefix).NameLn("Expand").Msg(c).Out()
 }
 
 func (c *TypeConf) readFileConf() {
@@ -77,9 +77,7 @@ func (c *TypeConf) readFileConf() {
 	if c.Err == nil {
 		c.Err = viper.Unmarshal(&c)
 	} else {
-		ezlog.Debug().
-			Name(prefix).Msg("Config file: " + c.Err.Error()).
-			Out()
+		ezlog.Debug().Name(prefix).Name("Config file").Msg(c.Err).Out()
 	}
 }
 

@@ -40,7 +40,7 @@ func (s *IsPlaylistVideo) New(page *rod.Page, urlStr string, scrollMax int) *IsP
 		UrlStr:    urlStr,
 	}
 	s.Processor = is.New(&property) // Init the base struct
-	s.MyType = "IsVideoList"
+	s.MyType = "IsPlaylistVideo"
 
 	s.override()
 

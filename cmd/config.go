@@ -33,10 +33,7 @@ var configCmd = &cobra.Command{
 	Aliases: []string{"c", "conf"},
 	Short:   "Print configurations",
 	Run: func(cmd *cobra.Command, args []string) {
-		ezlog.Log().
-			MsgLn("Config:").
-			Msg(&global.Conf).
-			Out()
+		ezlog.Log().NameLn("Config").Msg(&global.Conf).Out()
 	},
 }
 

@@ -48,7 +48,7 @@ var playlistCmd = &cobra.Command{
 			Run()
 
 		if isPlaylist.Err == nil {
-			ezlog.Log().Msg("Playlist:").Out()
+			ezlog.Log().Name("Playlist").Out()
 			isPlaylist.IInfoList.Print(is.PrintMatched)
 			if global.FlagPlaylist.GetList {
 				for _, info := range *isPlaylist.IInfoList {
@@ -79,6 +79,6 @@ func processVideoList(iinfo is.IInfo, page *rod.Page) {
 			info.Url,
 			global.Flag.ScrollMax).
 		Run()
-	ezlog.Log().Msg(info.Title).Out()
+	ezlog.Log().Name(info.Title).Out()
 	isVideoList.IInfoList.Print(is.PrintAll)
 }

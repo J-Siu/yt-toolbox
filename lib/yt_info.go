@@ -53,18 +53,18 @@ var (
 
 // Embed [is.InfoBase] for [is.IInfo] interface
 type YT_Info struct {
-	is.InfoBase `json:"InfoBase"`
+	is.InfoBase
 
 	// --- Channel info
-	ChName     string `json:"ChName"`
-	ChUrl      string `json:"ChUrl"`
-	ChUrlShort string `json:"ChUrlShort"`
+	ChName     string `json:"ChName,omitempty"`
+	ChUrl      string `json:"ChUrl,omitempty"`
+	ChUrlShort string `json:"ChUrlShort,omitempty"`
 
 	// --- Video info
-	Text   string   `json:"Text"`
-	Title  string   `json:"Title"`
-	Titles []string `json:"Titles"`
-	Url    string   `json:"Url"`
+	Text   string   `json:"Text,omitempty"`
+	Title  string   `json:"Title,omitempty"`
+	Titles []string `json:"Titles,omitempty"`
+	Url    string   `json:"Url,omitempty"`
 }
 
 func (s *YT_Info) String() string {

@@ -53,7 +53,7 @@ func UrlCleanup(urlIn string) (urlOut string, err error) {
 	return urlOut, err
 }
 
-// Return true, with the matched substring, if [str] contains any string in the [subStrings] list
+// Return true, with the matched substring, if [str] contains any string in the [subStrings] array
 func StrMatchList(str string, subStrings *[]string) (result bool, resultVal string) {
 	// prefix := "matchList"
 	for _, subStr := range *subStrings {
@@ -98,7 +98,7 @@ func GetTab(host string, port int) *rod.Page {
 	}
 
 	if err != nil {
-		ezlog.Err().Name(prefix).Name("Err").Msg(err)
+		ezlog.Err().Name(prefix).Name("Err").Msg(err).Out()
 	}
 	ezlog.Trace().Name(prefix).Msg("End").Out()
 	return page

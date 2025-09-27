@@ -143,7 +143,7 @@ func (s *IsHistoryVideo) override() {
 
 	s.V060_ElementProcessUnmatch = func(element *rod.Element, index int, infoP is.IInfo) {
 		prefix := s.MyType + ".V060_ElementProcessUnmatch"
-		ezlog.Trace().Name(prefix).Msg("Done")
+		ezlog.Trace().Name(prefix).Msg("Done").Out()
 	}
 
 	s.V080_ElementScrollable = func(element *rod.Element, index int, infoP is.IInfo) bool {
