@@ -22,7 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/J-Siu/go-ezlog/v2"
+	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/yt-toolbox/global"
 	"github.com/spf13/cobra"
 )

@@ -22,7 +22,8 @@ THE SOFTWARE.
 package lib
 
 import (
-	"github.com/J-Siu/go-ezlog/v2"
+	"github.com/J-Siu/go-helper/v2/ezlog"
+	"github.com/J-Siu/go-helper/v2/str"
 	"github.com/J-Siu/go-is"
 	"github.com/go-rod/rod"
 )
@@ -117,11 +118,11 @@ func (s *IsPlaylist) override() {
 		yt_Info := info.(*YT_Info)
 		matched = true // default to matched
 		if len(*s.Include) != 0 {
-			matched, matchedStr = StrMatchList(yt_Info.Title, s.Include)
+			matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, s.Include)
 		}
 		// Exclude override Include
 		if len(*s.Exclude) != 0 {
-			matched, matchedStr = StrMatchList(yt_Info.Title, s.Exclude)
+			matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, s.Exclude)
 			if matched {
 				matched = false
 			}

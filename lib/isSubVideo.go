@@ -22,7 +22,8 @@ THE SOFTWARE.
 package lib
 
 import (
-	"github.com/J-Siu/go-ezlog/v2"
+	"github.com/J-Siu/go-helper/v2/ezlog"
+	"github.com/J-Siu/go-helper/v2/str"
 	"github.com/J-Siu/go-is"
 	"github.com/go-rod/rod"
 )
@@ -97,7 +98,7 @@ func (s *IsSubVideo) override() {
 					excludeText := []string{"views", "watch", "scheduled"}
 					for _, eRole := range eRoles {
 						text := eRole.MustText()
-						if !MustStrMatchList(text, &excludeText) {
+						if !str.ContainsAnySubStringsBool(&text, &excludeText) {
 							info.Text = text
 						}
 						// search for watching, minutes, hours, day, <date>

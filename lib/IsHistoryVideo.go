@@ -25,7 +25,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/J-Siu/go-ezlog/v2"
+	"github.com/J-Siu/go-helper/v2/ezlog"
+	"github.com/J-Siu/go-helper/v2/str"
 	"github.com/J-Siu/go-is"
 	"github.com/go-rod/rod"
 )
@@ -121,7 +122,7 @@ func (s *IsHistoryVideo) override() {
 		info := infoP.(*YT_Info)
 		chkStr := info.Title + " " + info.Text + " " + info.ChName + " " + info.ChUrlShort
 
-		matched, matchedStr = StrMatchList(chkStr, &s.Filter)
+		matched, matchedStr = str.ContainsAnySubStrings(&chkStr, &s.Filter)
 
 		ezlog.Trace().Name(prefix).Msg("End").Out()
 		return matched, matchedStr

@@ -25,8 +25,7 @@ import (
 	"net/url"
 
 	"github.com/J-Siu/go-dtquery/dq"
-	"github.com/J-Siu/go-ezlog/v2"
-	"github.com/charlievieth/strcase"
+	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/go-rod/rod"
 )
 
@@ -51,25 +50,6 @@ func UrlCleanup(urlIn string) (urlOut string, err error) {
 		}
 	}
 	return urlOut, err
-}
-
-// Return true, with the matched substring, if [str] contains any string in the [subStrings] array
-func StrMatchList(str string, subStrings *[]string) (result bool, resultVal string) {
-	// prefix := "matchList"
-	for _, subStr := range *subStrings {
-		if strcase.Contains(str, subStr) {
-			result = true
-			resultVal = subStr
-			break
-		}
-	}
-	return result, resultVal
-}
-
-// Return only bool from [StrMatchList]
-func MustStrMatchList(str string, subStrings *[]string) (result bool) {
-	result, _ = StrMatchList(str, subStrings)
-	return result
 }
 
 func GetTab(host string, port int) *rod.Page {

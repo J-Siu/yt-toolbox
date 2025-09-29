@@ -24,7 +24,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/J-Siu/go-ezlog/v2"
+	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/yt-toolbox/global"
 	"github.com/J-Siu/yt-toolbox/lib"
 	"github.com/spf13/cobra"

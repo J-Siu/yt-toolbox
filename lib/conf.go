@@ -22,10 +22,9 @@ THE SOFTWARE.
 package lib
 
 import (
-	"os"
-	"regexp"
-
-	"github.com/J-Siu/go-ezlog/v2"
+	"github.com/J-Siu/go-basestruct"
+	"github.com/J-Siu/go-helper/v2/ezlog"
+	"github.com/J-Siu/go-helper/v2/file"
 	"github.com/spf13/viper"
 )
 
@@ -37,9 +36,7 @@ var ConfDefault = TypeConf{
 }
 
 type TypeConf struct {
-	Err    error
-	init   bool
-	myType string
+	basestruct.Base
 
 	FileConf string `json:"FileConf"`
 
@@ -50,9 +47,9 @@ type TypeConf struct {
 }
 
 func (c *TypeConf) New() {
-	c.init = true
-	c.myType = "TypeConf"
-	prefix := c.myType + ".New"
+	c.Initialized = true
+	c.MyType = "TypeConf"
+	prefix := c.MyType + ".New"
 
 	c.setDefault()
 	ezlog.Debug().Name(prefix).NameLn("Default").Msg(c).Out()
@@ -67,17 +64,17 @@ func (c *TypeConf) New() {
 }
 
 func (c *TypeConf) readFileConf() {
-	prefix := c.myType + ".readFileConf"
+	prefix := c.MyType + ".readFileConf"
 
 	viper.SetConfigType("json")
-	viper.SetConfigFile(TildeEnvExpand(c.FileConf))
+	viper.SetConfigFile(file.TildeEnvExpand(c.FileConf))
 	viper.AutomaticEnv()
 	c.Err = viper.ReadInConfig()
 
 	if c.Err == nil {
 		c.Err = viper.Unmarshal(&c)
 	} else {
-		ezlog.Debug().Name(prefix).Name("Config file").Msg(c.Err).Out()
+		ezlog.Debug().Name(prefix).Msg(c.Err).Out()
 	}
 }
 
@@ -91,16 +88,5 @@ func (c *TypeConf) setDefault() {
 }
 
 func (c *TypeConf) expand() {
-	c.FileConf = TildeEnvExpand(c.FileConf)
-}
-
-// Expand Linux `~` and environment variable in string
-func TildeEnvExpand(strIn string) (strOut string) {
-	if strIn == "~" {
-		strOut = "$HOME"
-	} else {
-		re := regexp.MustCompile(`^~/`)
-		strOut = re.ReplaceAllString(strIn, "$$HOME/")
-	}
-	return os.ExpandEnv(strOut)
+	c.FileConf = file.TildeEnvExpand(c.FileConf)
 }
