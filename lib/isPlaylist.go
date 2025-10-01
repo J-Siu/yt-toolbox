@@ -64,7 +64,7 @@ func (s *IsPlaylist) override() {
 		ezlog.Trace().N(prefix).TxtStart().Out()
 		byId := "#contents"
 		e := s.Page.MustElement(byId) // by id
-		if ezlog.GetLogLevel() == ezlog.TraceLevel {
+		if ezlog.GetLogLevel() == ezlog.TRACE {
 			ezlog.Trace().N(prefix).Mn(byId).M(e.MustHTML()).Out()
 		}
 		ezlog.Trace().N(prefix).TxtEnd().Out()
@@ -88,7 +88,7 @@ func (s *IsPlaylist) override() {
 
 		if element != nil {
 			var info YT_Info
-			if ezlog.GetLogLevel() == ezlog.TraceLevel {
+			if ezlog.GetLogLevel() == ezlog.TRACE {
 				ezlog.Trace().N(prefix).Nn("element").M(element.MustHTML()).Out()
 			}
 			h3 := element.MustElement("h3")
@@ -100,7 +100,7 @@ func (s *IsPlaylist) override() {
 			es := element.MustElements(tagName)
 			for _, s := range es {
 				if s.MustText() == "View full playlist" {
-					if ezlog.GetLogLevel() == ezlog.TraceLevel {
+					if ezlog.GetLogLevel() == ezlog.TRACE {
 						ezlog.Trace().N(prefix).Nn(tagName).M(s.MustHTML()).Out()
 					}
 					info.Url = UrlYT.Base + *(s.MustAttribute("href"))

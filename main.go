@@ -27,6 +27,6 @@ import (
 )
 
 func main() {
-	ezlog.SetLogLevel(ezlog.ErrLevel)
+	ezlog.SetLogLevel(ezlog.ERR)
 	cmd.Execute()
 }

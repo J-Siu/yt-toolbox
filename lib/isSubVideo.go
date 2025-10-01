@@ -108,7 +108,7 @@ func (s *IsSubVideo) override() {
 			if err != nil {
 				// These are shorts with not meta block
 				info.Text = "Short"
-				// if ezlog.GetLogLevel() == ezlog.TraceLevel {
+				// if ezlog.GetLogLevel() == ezlog.TRACE {
 				// 	ezlog.Trace().N(prefix).Nn("Err element").M(element.MustHTML()).Out()
 				// }
 			}

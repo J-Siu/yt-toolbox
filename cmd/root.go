@@ -37,10 +37,10 @@ var rootCmd = &cobra.Command{
 	Version: global.Version,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if global.Flag.Debug {
-			ezlog.SetLogLevel(ezlog.DebugLevel)
+			ezlog.SetLogLevel(ezlog.DEBUG)
 		}
 		if global.Flag.Trace {
-			ezlog.SetLogLevel(ezlog.TraceLevel)
+			ezlog.SetLogLevel(ezlog.TRACE)
 		}
 		ezlog.Debug().N("Version").Mn("global.Version").Nn("Flag").M(&global.Flag).Out()
 		global.Conf.New()

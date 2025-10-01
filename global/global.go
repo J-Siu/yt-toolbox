@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	Version = "v0.0.1"
+	Version = "v0.5.0"
 
 	Conf         lib.TypeConf
 	Flag         lib.TypeFlag

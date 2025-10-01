@@ -82,7 +82,7 @@ func (s *IsHistoryVideo) override() {
 			var info YT_Info
 			byId := "#video-title"
 			elementTitle := element.MustElement(byId) // by id
-			if ezlog.GetLogLevel() == ezlog.TraceLevel {
+			if ezlog.GetLogLevel() == ezlog.TRACE {
 				ezlog.Trace().N(prefix).Mn(byId).M(elementTitle.MustHTML()).Out()
 			}
 			info.Title = strings.TrimSpace(elementTitle.MustText())
