@@ -48,29 +48,29 @@ func (s *IsSubVideo) New(page *rod.Page, urlStr string, scrollMax int) *IsSubVid
 
 	s.override()
 
-	ezlog.Trace().Name(prefix).Msg("Done")
+	ezlog.Trace().N(prefix).M("Done")
 	return s
 }
 
 func (s *IsSubVideo) override() {
 	s.V020_Elements = func(element *rod.Element) *rod.Elements {
 		prefix := s.MyType + ".V020_Elements"
-		ezlog.Trace().Name(prefix).Msg("Start").Out()
+		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		var elements rod.Elements
 		tagName := "ytd-rich-item-renderer"
 		s.Page.MustElement(tagName)
 		elements = s.Page.MustElements(tagName)
-		ezlog.Debug().Name(prefix).Name("elements count").Msg(len(elements)).Out()
+		ezlog.Debug().N(prefix).N("elements count").M(len(elements)).Out()
 
-		ezlog.Trace().Name(prefix).Msg("End").Out()
+		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return &elements
 	}
 
 	// [element] : "ytd-rich-item-renderer" element from V20_elements()
 	s.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
 		prefix := s.MyType + ".V030_ElementInfo"
-		ezlog.Trace().Name(prefix).Msg("Start").Out()
+		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		if element != nil {
 			var (
@@ -109,14 +109,14 @@ func (s *IsSubVideo) override() {
 				// These are shorts with not meta block
 				info.Text = "Short"
 				// if ezlog.GetLogLevel() == ezlog.TraceLevel {
-				// 	ezlog.Trace().Name(prefix).NameLn("Err element").Msg(element.MustHTML()).Out()
+				// 	ezlog.Trace().N(prefix).Nn("Err element").M(element.MustHTML()).Out()
 				// }
 			}
 			// ---
-			ezlog.Debug().NameLn(prefix).Msg(info).Out()
+			ezlog.Debug().Nn(prefix).M(info).Out()
 			infoP = &info
 		}
-		ezlog.Trace().Name(prefix).Msg("End").Out()
+		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return infoP
 	}
 }

@@ -22,7 +22,7 @@ THE SOFTWARE.
 package lib
 
 import (
-	"github.com/J-Siu/go-basestruct"
+	"github.com/J-Siu/go-helper/v2/basestruct"
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-helper/v2/file"
 	"github.com/spf13/viper"
@@ -52,15 +52,15 @@ func (c *TypeConf) New() {
 	prefix := c.MyType + ".New"
 
 	c.setDefault()
-	ezlog.Debug().Name(prefix).NameLn("Default").Msg(c).Out()
+	ezlog.Debug().N(prefix).Nn("Default").M(c).Out()
 
 	c.readFileConf()
-	ezlog.Debug().Name(prefix).NameLn("Raw").Msg(c).Out()
+	ezlog.Debug().N(prefix).Nn("Raw").M(c).Out()
 
 	// TODO: add flag
 
 	c.expand()
-	ezlog.Debug().Name(prefix).NameLn("Expand").Msg(c).Out()
+	ezlog.Debug().N(prefix).Nn("Expand").M(c).Out()
 }
 
 func (c *TypeConf) readFileConf() {
@@ -74,7 +74,7 @@ func (c *TypeConf) readFileConf() {
 	if c.Err == nil {
 		c.Err = viper.Unmarshal(&c)
 	} else {
-		ezlog.Debug().Name(prefix).Msg(c.Err).Out()
+		ezlog.Debug().N(prefix).M(c.Err).Out()
 	}
 }
 

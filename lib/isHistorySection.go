@@ -23,6 +23,7 @@ package lib
 
 import (
 	"github.com/J-Siu/go-helper/v2/ezlog"
+	"github.com/J-Siu/go-helper/v2/strany"
 	"github.com/J-Siu/go-is"
 	"github.com/go-rod/rod"
 )
@@ -61,23 +62,23 @@ func (s *IsHistorySection) New(page *rod.Page, urlStr string, remove bool, scrol
 func (s *IsHistorySection) override() {
 	s.V020_Elements = func(element *rod.Element) *rod.Elements {
 		prefix := s.MyType + ".V020_Elements"
-		ezlog.Trace().Name(prefix).Msg("Start").Out()
+		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		var tagName = "ytd-item-section-renderer"
 		e := s.Page.MustElement(tagName)
-		ezlog.Trace().Name(prefix).Name("MustWaitDOMStable").Msg("Start").Out()
+		ezlog.Trace().N(prefix).N("MustWaitDOMStable").TxtStart().Out()
 		e.MustWaitVisible()
-		ezlog.Trace().Name(prefix).Name("MustWaitDOMStable").Msg("End").Out()
+		ezlog.Trace().N(prefix).N("MustWaitDOMStable").TxtEnd().Out()
 		elements := s.Page.MustElements(tagName)
-		ezlog.Trace().Name(prefix).Name(tagName).Name("element count").Msg(len(elements)).Out()
+		ezlog.Trace().N(prefix).N(tagName).N("element count").M(len(elements)).Out()
 
-		ezlog.Trace().Name(prefix).Msg("End").Out()
+		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return &elements
 	}
 
 	s.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
 		prefix := s.MyType + ".V030_ElementInfo"
-		ezlog.Trace().Name(prefix).Msg("Start").Out()
+		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		if element != nil {
 			var (
@@ -87,12 +88,13 @@ func (s *IsHistorySection) override() {
 			)
 			elements, s.Err = element.Elements(byId)
 			if s.Err != nil {
-				ezlog.Err().Name(prefix).Name("Err").Msg(s.Err).Out()
+				ezlog.Err().N(prefix).M(s.Err).Out()
 			}
 
 			for j, item := range elements {
 				title := item.MustText()
-				ezlog.Log().Ln().Name("## Section[").Sp(index).Sp("] Title[").Sp(j).Sp("]").Msg(title).Out()
+				tmp := "## Section[" + *strany.Any(index) + "] Title[" + *strany.Any(j) + "]"
+				ezlog.Log().Ln().N(tmp).M(title).Out()
 				info.Titles = append(info.Titles, title)
 			}
 			if len(info.Titles) == 0 {
@@ -101,13 +103,13 @@ func (s *IsHistorySection) override() {
 			infoP = &info
 		}
 
-		ezlog.Trace().Name(prefix).Msg("End").Out()
+		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return infoP
 	}
 
 	s.V070_ElementProcess = func(element *rod.Element, index int, infoP is.IInfo) {
 		prefix := s.MyType + ".V070_ElementProcess"
-		ezlog.Trace().Name(prefix).Msg("Start").Out()
+		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		titles := &infoP.(*YT_Info).Titles
 		if len(*titles) != 0 && len((*titles)[0]) != 0 {
@@ -128,12 +130,12 @@ func (s *IsHistorySection) override() {
 			isHistoryVideo.IInfoList.Print(mode)
 		}
 
-		ezlog.Trace().Name(prefix).Msg("End").Out()
+		ezlog.Trace().N(prefix).TxtEnd().Out()
 	}
 
 	s.V100_ScrollLoopEnd = func(state *is.State) {
 		prefix := s.MyType + "V100_ScrollLoopEnd"
-		ezlog.Trace().Name(prefix).Msg("Start").Out()
+		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		if s.Remove {
 			s.removeSpinningWheel()
@@ -146,11 +148,11 @@ func (s *IsHistorySection) override() {
 			state.ElementLast = nil
 		}
 		state.Scroll = true
-		ezlog.Trace().Name(prefix).Name("MustWaitLoad").Msg("Start").Out()
+		ezlog.Trace().N(prefix).N("MustWaitLoad").TxtStart().Out()
 		s.Page.MustWaitLoad()
-		ezlog.Trace().Name(prefix).Name("MustWaitLoad").Msg("End").Out()
+		ezlog.Trace().N(prefix).N("MustWaitLoad").TxtEnd().Out()
 
-		ezlog.Trace().Name(prefix).Msg("End").Out()
+		ezlog.Trace().N(prefix).TxtEnd().Out()
 	}
 }
 

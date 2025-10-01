@@ -54,7 +54,7 @@ func UrlCleanup(urlIn string) (urlOut string, err error) {
 
 func GetTab(host string, port int) *rod.Page {
 	prefix := "GetTab"
-	ezlog.Trace().Name(prefix).Msg("Start").Out()
+	ezlog.Trace().N(prefix).TxtStart().Out()
 	var (
 		browser *rod.Browser
 		err     error
@@ -78,8 +78,8 @@ func GetTab(host string, port int) *rod.Page {
 	}
 
 	if err != nil {
-		ezlog.Err().Name(prefix).Name("Err").Msg(err).Out()
+		ezlog.Err().N(prefix).M(err).Out()
 	}
-	ezlog.Trace().Name(prefix).Msg("End").Out()
+	ezlog.Trace().N(prefix).TxtEnd().Out()
 	return page
 }
