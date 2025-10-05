@@ -19,12 +19,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
 package cmd
 
 import (
 	"os"
 
+	"github.com/J-Siu/go-helper/v2/errs"
 	"github.com/J-Siu/go-helper/v2/ezlog"
+	"github.com/J-Siu/go-helper/v2/ver"
 	"github.com/J-Siu/yt-toolbox/global"
 	"github.com/J-Siu/yt-toolbox/lib"
 	"github.com/spf13/cobra"
@@ -34,7 +37,7 @@ var rootCmd = &cobra.Command{
 	Use:     "yt-toolbox",
 	Aliases: []string{"gyt"},
 	Short:   "YouTube toolbox",
-	Version: global.Version,
+	Version: ver.M(0).N(0).P(5).String(),
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if global.Flag.Debug {
 			ezlog.SetLogLevel(ezlog.DEBUG)
@@ -45,7 +48,13 @@ var rootCmd = &cobra.Command{
 		ezlog.Debug().N("Version").Mn("global.Version").Nn("Flag").M(&global.Flag).Out()
 		global.Conf.New()
 	},
-	PersistentPostRun: func(cmd *cobra.Command, args []string) {},
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		if !errs.IsEmpty() {
+			ezlog.Err().Ln().M(errs.Errs).Out()
+			cmd.Usage()
+			os.Exit(1)
+		}
+	},
 }
 
 func Execute() {
