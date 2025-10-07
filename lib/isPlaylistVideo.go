@@ -32,7 +32,7 @@ type IsPlaylistVideo struct {
 	*is.Processor
 }
 
-func (s *IsPlaylistVideo) New(page *rod.Page, urlStr string, scrollMax int) *IsPlaylistVideo {
+func (t *IsPlaylistVideo) New(page *rod.Page, urlStr string, scrollMax int) *IsPlaylistVideo {
 	property := is.Property{
 		IInfoList: new(is.IInfoList),
 		Page:      page,
@@ -40,28 +40,33 @@ func (s *IsPlaylistVideo) New(page *rod.Page, urlStr string, scrollMax int) *IsP
 		UrlLoad:   true,
 		UrlStr:    urlStr,
 	}
-	s.Processor = is.New(&property) // Init the base struct
-	s.MyType = "IsPlaylistVideo"
+	t.Processor = is.New(&property) // Init the base struct
+	t.MyType = "IsPlaylistVideo"
 
-	s.override()
+	t.override()
 
-	return s
+	return t
 }
 
-func (s *IsPlaylistVideo) override() {
-	s.V010_Container = func() *rod.Element {
-		prefix := s.MyType + ".V010_ElementsContainer"
+func (t *IsPlaylistVideo) Run() *IsPlaylistVideo {
+	t.Processor.Run()
+	return t
+}
+
+func (t *IsPlaylistVideo) override() {
+	t.V010_Container = func() *rod.Element {
+		prefix := t.MyType + ".V010_ElementsContainer"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 		tagName := "ytd-playlist-video-list-renderer"
-		element := s.Page.MustElement(tagName)
+		element := t.Page.MustElement(tagName)
 		ezlog.Debug().N(prefix).Nn(tagName).M(element).Out()
 
 		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return element
 	}
 
-	s.V020_Elements = func(element *rod.Element) *rod.Elements {
-		prefix := s.MyType + ".V020_Elements"
+	t.V020_Elements = func(element *rod.Element) *rod.Elements {
+		prefix := t.MyType + ".V020_Elements"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 		tagName := "ytd-playlist-video-renderer"
 		es := element.MustElements(tagName)
@@ -70,8 +75,8 @@ func (s *IsPlaylistVideo) override() {
 		return &es
 	}
 
-	s.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
-		prefix := s.MyType + ".V030_ElementInfo"
+	t.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
+		prefix := t.MyType + ".V030_ElementInfo"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 		if element != nil {
 			var info YT_Info

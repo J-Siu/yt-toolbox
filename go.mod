@@ -3,9 +3,9 @@ module github.com/J-Siu/yt-toolbox
 go 1.25.1
 
 require (
-	github.com/J-Siu/go-dtquery v0.0.8
-	github.com/J-Siu/go-helper/v2 v2.4.2
-	github.com/J-Siu/go-is v1.1.6
+	github.com/J-Siu/go-dtquery v0.0.10
+	github.com/J-Siu/go-helper/v2 v2.5.0
+	github.com/J-Siu/go-is v1.1.7
 	github.com/go-rod/rod v0.116.2
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/viper v1.21.0

@@ -36,8 +36,7 @@ var historyCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		page := lib.GetTab(global.Conf.DevtoolsHost, global.Conf.DevtoolsPort)
 
-		isHistorySection := new(lib.IsHistorySection)
-		isHistorySection.
+		isHistorySection := new(lib.IsHistorySection).
 			New(
 				page,
 				lib.UrlYT.History,

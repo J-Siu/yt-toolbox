@@ -38,8 +38,7 @@ var playlistCmd = &cobra.Command{
 	Short:   "Get Youtube Playlist",
 	Run: func(cmd *cobra.Command, args []string) {
 		page := lib.GetTab(global.Conf.DevtoolsHost, global.Conf.DevtoolsPort)
-		isPlaylist := new(lib.IsPlaylist)
-		isPlaylist.
+		isPlaylist := new(lib.IsPlaylist).
 			New(
 				page,
 				lib.UrlYT.Playlists,

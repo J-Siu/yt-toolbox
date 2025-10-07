@@ -37,8 +37,7 @@ var subChannelCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		page := lib.GetTab(global.Conf.DevtoolsHost, global.Conf.DevtoolsPort)
 
-		isSubCh := new(lib.IsSubChannel)
-		isSubCh.
+		isSubCh := new(lib.IsSubChannel).
 			New(
 				page,
 				lib.UrlYT.SubChannels,

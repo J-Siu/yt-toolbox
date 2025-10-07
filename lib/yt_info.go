@@ -68,6 +68,6 @@ type YT_Info struct {
 	Url    string   `json:"Url,omitempty"`
 }
 
-func (s *YT_Info) String() string {
-	return "[" + s.Title + "](" + UrlDecode(s.Url) + ") | [" + s.ChName + "](" + s.ChUrl + "] | " + s.Text
+func (t *YT_Info) String() string {
+	return "[" + t.Title + "](" + UrlDecode(t.Url) + ") | [" + t.ChName + "](" + t.ChUrl + "] | " + t.Text
 }

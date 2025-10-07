@@ -46,37 +46,42 @@ type IsHistoryVideo struct {
 	Filter      []string
 }
 
-func (s *IsHistoryVideo) New(property *is.Property, del bool, remove bool, filter *[]string) *IsHistoryVideo {
-	s.Processor = is.New(property) // Init the base struct
-	s.MyType = "IsHistoryVideo"
+func (t *IsHistoryVideo) New(property *is.Property, del bool, remove bool, filter *[]string) *IsHistoryVideo {
+	t.Processor = is.New(property) // Init the base struct
+	t.MyType = "IsHistoryVideo"
 
-	s.Filter = append(s.Filter, *filter...)
-	s.Del = del
-	s.Remove = remove
-	s.override()
+	t.Filter = append(t.Filter, *filter...)
+	t.Del = del
+	t.Remove = remove
+	t.override()
 
-	return s
+	return t
 }
 
-func (s *IsHistoryVideo) override() {
-	s.V020_Elements = func(element *rod.Element) *rod.Elements {
-		prefix := s.MyType + ".V020_Elements"
+func (t *IsHistoryVideo) Run() *IsHistoryVideo {
+	t.Processor.Run()
+	return t
+}
+
+func (t *IsHistoryVideo) override() {
+	t.V020_Elements = func(element *rod.Element) *rod.Elements {
+		prefix := t.MyType + ".V020_Elements"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
-		s.V021_ElementsRemoveShorts(element)
+		t.V021_ElementsRemoveShorts(element)
 		tagName := "ytd-video-renderer"
 		var elements rod.Elements
-		elements, s.Err = element.Elements(tagName)
-		if s.Err != nil {
-			ezlog.Err().N(prefix).M(s.Err).Out()
+		elements, t.Err = element.Elements(tagName)
+		if t.Err != nil {
+			ezlog.Err().N(prefix).M(t.Err).Out()
 		}
 		ezlog.Debug().N(prefix).N("elements count").M(len(elements)).Out()
 		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return &elements
 	}
 
-	s.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
-		prefix := s.MyType + ".V030_ElementInfo"
+	t.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
+		prefix := t.MyType + ".V030_ElementInfo"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		if element != nil {
@@ -116,25 +121,25 @@ func (s *IsHistoryVideo) override() {
 		return infoP
 	}
 
-	s.V040_ElementMatch = func(element *rod.Element, index int, infoP is.IInfo) (matched bool, matchedStr string) {
-		prefix := s.MyType + ".V040_ElementMatch"
+	t.V040_ElementMatch = func(element *rod.Element, index int, infoP is.IInfo) (matched bool, matchedStr string) {
+		prefix := t.MyType + ".V040_ElementMatch"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		info := infoP.(*YT_Info)
 		chkStr := info.Title + " " + info.Text + " " + info.ChName + " " + info.ChUrlShort
 
-		matched, matchedStr = str.ContainsAnySubStrings(&chkStr, &s.Filter)
+		matched, matchedStr = str.ContainsAnySubStrings(&chkStr, &t.Filter)
 
 		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return matched, matchedStr
 	}
 
-	s.V050_ElementProcessMatched = func(element *rod.Element, index int, infoP is.IInfo) {
-		prefix := s.MyType + ".V050_ElementProcessMatched"
+	t.V050_ElementProcessMatched = func(element *rod.Element, index int, infoP is.IInfo) {
+		prefix := t.MyType + ".V050_ElementProcessMatched"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
-		if s.Del {
-			s.Deleted = true
+		if t.Del {
+			t.Deleted = true
 			element.MustElement("#top-level-buttons-computed").MustClick()
 			// time.Sleep(time.Duration(s.ClickSleep))
 			ezlog.Debug().N(prefix).M("Deleted").Out()
@@ -143,31 +148,31 @@ func (s *IsHistoryVideo) override() {
 		ezlog.Trace().N(prefix).TxtEnd().Out()
 	}
 
-	s.V060_ElementProcessUnmatch = func(element *rod.Element, index int, infoP is.IInfo) {
-		prefix := s.MyType + ".V060_ElementProcessUnmatch"
+	t.V060_ElementProcessUnmatch = func(element *rod.Element, index int, infoP is.IInfo) {
+		prefix := t.MyType + ".V060_ElementProcessUnmatch"
 		ezlog.Trace().N(prefix).M("Done").Out()
 	}
 
-	s.V080_ElementScrollable = func(element *rod.Element, index int, infoP is.IInfo) bool {
-		prefix := s.MyType + ".V080_ElementScrollable"
+	t.V080_ElementScrollable = func(element *rod.Element, index int, infoP is.IInfo) bool {
+		prefix := t.MyType + ".V080_ElementScrollable"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		info := infoP.(*YT_Info)
-		notScrollable := s.Deleted
+		notScrollable := t.Deleted
 		if (!notScrollable && len(info.Title) == 0) || !element.MustVisible() {
 			notScrollable = true
 		}
-		s.Deleted = false
+		t.Deleted = false
 
 		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return !notScrollable
 	}
 
-	s.V100_ScrollLoopEnd = func(state *is.State) {
-		prefix := s.MyType + ".V100_ScrollLoopEnd"
+	t.V100_ScrollLoopEnd = func(state *is.State) {
+		prefix := t.MyType + ".V100_ScrollLoopEnd"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
-		if s.Remove {
+		if t.Remove {
 			if state.Elements != nil {
 				removed := 0
 				for _, e := range *state.Elements {
@@ -177,7 +182,7 @@ func (s *IsHistoryVideo) override() {
 				state.ElementCountLast = 0
 				state.ElementLast = nil
 			}
-			es := s.Page.MustElements("ytd-item-section-renderer")
+			es := t.Page.MustElements("ytd-item-section-renderer")
 			if es != nil {
 				state.ElementLast = es.Last()
 				if state.ElementLastScroll != nil && state.ElementLast != nil && (state.ElementLastScroll.Object.ObjectID != state.ElementLast.Object.ObjectID) {
@@ -202,15 +207,15 @@ func (s *IsHistoryVideo) override() {
 
 }
 
-func (s *IsHistoryVideo) V021_ElementsRemoveShorts(element *rod.Element) *IsHistoryVideo {
-	prefix := s.MyType + ".V020_ElementsRemoveShorts"
+func (t *IsHistoryVideo) V021_ElementsRemoveShorts(element *rod.Element) *IsHistoryVideo {
+	prefix := t.MyType + ".V020_ElementsRemoveShorts"
 	ezlog.Trace().N(prefix).TxtStart().Out()
 
 	var tagName = "ytd-reel-shelf-renderer"
 	var es rod.Elements
-	es, s.Err = element.Elements(tagName)
-	if s.Err != nil {
-		ezlog.Err().N(prefix).M(s.Err).Out()
+	es, t.Err = element.Elements(tagName)
+	if t.Err != nil {
+		ezlog.Err().N(prefix).M(t.Err).Out()
 	}
 	es_count := len(es)
 	for i := range es {
@@ -218,5 +223,5 @@ func (s *IsHistoryVideo) V021_ElementsRemoveShorts(element *rod.Element) *IsHist
 	}
 
 	ezlog.Trace().N(prefix).TxtEnd().Out()
-	return s
+	return t
 }

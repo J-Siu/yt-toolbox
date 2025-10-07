@@ -47,47 +47,45 @@ type TypeConf struct {
 	DevtoolsPort int    `json:"DevtoolsPort"`
 }
 
-func (c *TypeConf) New() {
-	c.Initialized = true
-	c.MyType = "TypeConf"
-	prefix := c.MyType + ".New"
+func (t *TypeConf) New() {
+	t.Initialized = true
+	t.MyType = "TypeConf"
+	prefix := t.MyType + ".New"
 
-	c.setDefault()
-	ezlog.Debug().N(prefix).Nn("Default").M(c).Out()
+	t.setDefault()
+	ezlog.Debug().N(prefix).Nn("Default").M(t).Out()
 
-	c.readFileConf()
-	ezlog.Debug().N(prefix).Nn("Raw").M(c).Out()
+	t.readFileConf()
+	ezlog.Debug().N(prefix).Nn("Raw").M(t).Out()
 
-	// TODO: add flag
-
-	c.expand()
-	ezlog.Debug().N(prefix).Nn("Expand").M(c).Out()
+	t.expand()
+	ezlog.Debug().N(prefix).Nn("Expand").M(t).Out()
 }
 
-func (c *TypeConf) readFileConf() {
-	prefix := c.MyType + ".readFileConf"
+func (t *TypeConf) readFileConf() {
+	prefix := t.MyType + ".readFileConf"
 
 	viper.SetConfigType("json")
-	viper.SetConfigFile(file.TildeEnvExpand(c.FileConf))
+	viper.SetConfigFile(file.TildeEnvExpand(t.FileConf))
 	viper.AutomaticEnv()
-	c.Err = viper.ReadInConfig()
+	t.Err = viper.ReadInConfig()
 
-	if c.Err == nil {
-		c.Err = viper.Unmarshal(&c)
+	if t.Err == nil {
+		t.Err = viper.Unmarshal(&t)
 	} else {
-		ezlog.Debug().N(prefix).M(c.Err).Out()
+		ezlog.Debug().N(prefix).M(t.Err).Out()
 	}
 }
 
 // Should be called before reading config file
-func (c *TypeConf) setDefault() {
-	if c.FileConf == "" {
-		c.FileConf = ConfDefault.FileConf
+func (t *TypeConf) setDefault() {
+	if t.FileConf == "" {
+		t.FileConf = ConfDefault.FileConf
 	}
-	c.DevtoolsHost = ConfDefault.DevtoolsHost
-	c.DevtoolsPort = ConfDefault.DevtoolsPort
+	t.DevtoolsHost = ConfDefault.DevtoolsHost
+	t.DevtoolsPort = ConfDefault.DevtoolsPort
 }
 
-func (c *TypeConf) expand() {
-	c.FileConf = file.TildeEnvExpand(c.FileConf)
+func (t *TypeConf) expand() {
+	t.FileConf = file.TildeEnvExpand(t.FileConf)
 }

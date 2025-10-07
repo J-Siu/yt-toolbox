@@ -42,7 +42,7 @@ type IsHistorySection struct {
 	Filter      []string
 }
 
-func (s *IsHistorySection) New(page *rod.Page, urlStr string, remove bool, scrollMax int, verbose bool) *IsHistorySection {
+func (t *IsHistorySection) New(page *rod.Page, urlStr string, remove bool, scrollMax int, verbose bool) *IsHistorySection {
 	property := is.Property{
 		IInfoList: new(is.IInfoList),
 		Page:      page,
@@ -50,35 +50,40 @@ func (s *IsHistorySection) New(page *rod.Page, urlStr string, remove bool, scrol
 		UrlLoad:   true,
 		UrlStr:    urlStr,
 	}
-	s.Processor = is.New(&property) // Init the base struct
-	s.MyType = "IsHistorySection"
+	t.Processor = is.New(&property) // Init the base struct
+	t.MyType = "IsHistorySection"
 
-	s.Remove = remove
-	s.Verbose = verbose
-	s.override()
+	t.Remove = remove
+	t.Verbose = verbose
+	t.override()
 
-	return s
+	return t
 }
 
-func (s *IsHistorySection) override() {
-	s.V020_Elements = func(element *rod.Element) *rod.Elements {
-		prefix := s.MyType + ".V020_Elements"
+func (t *IsHistorySection) Run() *IsHistorySection {
+	t.Processor.Run()
+	return t
+}
+
+func (t *IsHistorySection) override() {
+	t.V020_Elements = func(element *rod.Element) *rod.Elements {
+		prefix := t.MyType + ".V020_Elements"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		var tagName = "ytd-item-section-renderer"
-		e := s.Page.MustElement(tagName)
+		e := t.Page.MustElement(tagName)
 		ezlog.Trace().N(prefix).N("MustWaitDOMStable").TxtStart().Out()
 		e.MustWaitVisible()
 		ezlog.Trace().N(prefix).N("MustWaitDOMStable").TxtEnd().Out()
-		elements := s.Page.MustElements(tagName)
+		elements := t.Page.MustElements(tagName)
 		ezlog.Trace().N(prefix).N(tagName).N("element count").M(len(elements)).Out()
 
 		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return &elements
 	}
 
-	s.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
-		prefix := s.MyType + ".V030_ElementInfo"
+	t.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
+		prefix := t.MyType + ".V030_ElementInfo"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		if element != nil {
@@ -87,9 +92,9 @@ func (s *IsHistorySection) override() {
 				elements rod.Elements
 				byId     = "#title"
 			)
-			elements, s.Err = element.Elements(byId)
-			if s.Err != nil {
-				ezlog.Err().N(prefix).M(s.Err).Out()
+			elements, t.Err = element.Elements(byId)
+			if t.Err != nil {
+				ezlog.Err().N(prefix).M(t.Err).Out()
 			}
 
 			for j, item := range elements {
@@ -108,8 +113,8 @@ func (s *IsHistorySection) override() {
 		return infoP
 	}
 
-	s.V070_ElementProcess = func(element *rod.Element, index int, infoP is.IInfo) {
-		prefix := s.MyType + ".V070_ElementProcess"
+	t.V070_ElementProcess = func(element *rod.Element, index int, infoP is.IInfo) {
+		prefix := t.MyType + ".V070_ElementProcess"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		titles := &infoP.(*YT_Info).Titles
@@ -118,12 +123,12 @@ func (s *IsHistorySection) override() {
 			property := is.Property{
 				Container: element,
 				IInfoList: new(is.IInfoList),
-				Page:      s.Page,
+				Page:      t.Page,
 			}
 
-			isHistoryVideo.New(&property, s.Del, s.Remove, &s.Filter).Run()
+			isHistoryVideo.New(&property, t.Del, t.Remove, &t.Filter).Run()
 			var mode is.IInfoListPrintMode
-			if s.Verbose {
+			if t.Verbose {
 				mode = is.PrintAll
 			} else {
 				mode = is.PrintMatched
@@ -134,12 +139,12 @@ func (s *IsHistorySection) override() {
 		ezlog.Trace().N(prefix).TxtEnd().Out()
 	}
 
-	s.V100_ScrollLoopEnd = func(state *is.State) {
-		prefix := s.MyType + "V100_ScrollLoopEnd"
+	t.V100_ScrollLoopEnd = func(state *is.State) {
+		prefix := t.MyType + "V100_ScrollLoopEnd"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
-		if s.Remove {
-			s.removeSpinningWheel()
+		if t.Remove {
+			t.removeSpinningWheel()
 			if state.Elements != nil {
 				for _, e := range *state.Elements {
 					e.Remove()
@@ -150,15 +155,15 @@ func (s *IsHistorySection) override() {
 		}
 		state.Scroll = true
 		ezlog.Trace().N(prefix).N("MustWaitLoad").TxtStart().Out()
-		s.Page.MustWaitLoad()
+		t.Page.MustWaitLoad()
 		ezlog.Trace().N(prefix).N("MustWaitLoad").TxtEnd().Out()
 
 		ezlog.Trace().N(prefix).TxtEnd().Out()
 	}
 }
 
-func (s *IsHistorySection) removeSpinningWheel() {
-	es := s.Page.MustElements("ytd-continuation-item-renderer") // tag name
+func (t *IsHistorySection) removeSpinningWheel() {
+	es := t.Page.MustElements("ytd-continuation-item-renderer") // tag name
 	if es != nil {
 		count := len(es)
 		var removed int

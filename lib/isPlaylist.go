@@ -36,7 +36,7 @@ type IsPlaylist struct {
 	Include *[]string `json:"Include"`
 }
 
-func (s *IsPlaylist) New(page *rod.Page, urlStr string, scrollMax int, exclude *[]string, include *[]string) *IsPlaylist {
+func (t *IsPlaylist) New(page *rod.Page, urlStr string, scrollMax int, exclude *[]string, include *[]string) *IsPlaylist {
 	property := is.Property{
 		IInfoList: new(is.IInfoList),
 		Page:      page,
@@ -44,27 +44,32 @@ func (s *IsPlaylist) New(page *rod.Page, urlStr string, scrollMax int, exclude *
 		UrlLoad:   true,
 		UrlStr:    urlStr,
 	}
-	s.Processor = is.New(&property) // Init the base struct
-	s.MyType = "IsPlaylist"
-	prefix := s.MyType + ".New"
-	if s.Err != nil {
-		ezlog.Err().N(prefix).M(s.Err).Out()
+	t.Processor = is.New(&property) // Init the base struct
+	t.MyType = "IsPlaylist"
+	prefix := t.MyType + ".New"
+	if t.Err != nil {
+		ezlog.Err().N(prefix).M(t.Err).Out()
 	}
-	s.Exclude = exclude
-	s.Include = include
+	t.Exclude = exclude
+	t.Include = include
 
-	ezlog.Debug().Nn(prefix).M(s).Out()
-	s.override()
+	ezlog.Debug().Nn(prefix).M(t).Out()
+	t.override()
 
-	return s
+	return t
 }
 
-func (s *IsPlaylist) override() {
-	s.V010_Container = func() *rod.Element {
-		prefix := s.MyType + ".V010_ElementsContainer"
+func (t *IsPlaylist) Run() *IsPlaylist {
+	t.Processor.Run()
+	return t
+}
+
+func (t *IsPlaylist) override() {
+	t.V010_Container = func() *rod.Element {
+		prefix := t.MyType + ".V010_ElementsContainer"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 		byId := "#contents"
-		e := s.Page.MustElement(byId) // by id
+		e := t.Page.MustElement(byId) // by id
 		if ezlog.GetLogLevel() == ezlog.TRACE {
 			ezlog.Trace().N(prefix).Mn(byId).M(e.MustHTML()).Out()
 		}
@@ -72,8 +77,8 @@ func (s *IsPlaylist) override() {
 		return e
 	}
 
-	s.V020_Elements = func(element *rod.Element) *rod.Elements {
-		prefix := s.MyType + ".V020_Elements"
+	t.V020_Elements = func(element *rod.Element) *rod.Elements {
+		prefix := t.MyType + ".V020_Elements"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 		tagName := "ytd-rich-item-renderer"
 		elements := element.MustElements(tagName)
@@ -83,8 +88,8 @@ func (s *IsPlaylist) override() {
 		return &elements
 	}
 
-	s.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
-		prefix := s.MyType + ".V030_ElementInfo"
+	t.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
+		prefix := t.MyType + ".V030_ElementInfo"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		if element != nil {
@@ -114,16 +119,16 @@ func (s *IsPlaylist) override() {
 		return infoP
 	}
 
-	s.V040_ElementMatch = func(element *rod.Element, index int, info is.IInfo) (matched bool, matchedStr string) {
-		prefix := s.MyType + ".V040_ElementMatch"
+	t.V040_ElementMatch = func(element *rod.Element, index int, info is.IInfo) (matched bool, matchedStr string) {
+		prefix := t.MyType + ".V040_ElementMatch"
 		yt_Info := info.(*YT_Info)
 		matched = true // default to matched
-		if len(*s.Include) != 0 {
-			matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, s.Include)
+		if len(*t.Include) != 0 {
+			matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, t.Include)
 		}
 		// Exclude override Include
-		if len(*s.Exclude) != 0 {
-			matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, s.Exclude)
+		if len(*t.Exclude) != 0 {
+			matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, t.Exclude)
 			if matched {
 				matched = false
 			}

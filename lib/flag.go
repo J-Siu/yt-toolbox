@@ -46,5 +46,5 @@ type TypeFlagHistory struct {
 }
 
 type TypeFlagSub struct {
-	Day int
+	Day uint
 }

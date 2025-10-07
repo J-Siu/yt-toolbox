@@ -32,7 +32,7 @@ type IsSubChannel struct {
 	*is.Processor
 }
 
-func (s *IsSubChannel) New(page *rod.Page, urlStr string, scrollMax int) *IsSubChannel {
+func (t *IsSubChannel) New(page *rod.Page, urlStr string, scrollMax int) *IsSubChannel {
 	property := is.Property{
 		IInfoList: new(is.IInfoList),
 		Page:      page,
@@ -40,11 +40,16 @@ func (s *IsSubChannel) New(page *rod.Page, urlStr string, scrollMax int) *IsSubC
 		UrlLoad:   true,
 		UrlStr:    urlStr,
 	}
-	s.Processor = is.New(&property) // Init the base struct
-	s.MyType = "IsSubChannel"
+	t.Processor = is.New(&property) // Init the base struct
+	t.MyType = "IsSubChannel"
 
-	s.override()
-	return s
+	t.override()
+	return t
+}
+
+func (t *IsSubChannel) Run() *IsSubChannel {
+	t.Processor.Run()
+	return t
 }
 
 func (s *IsSubChannel) override() {

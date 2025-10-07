@@ -26,6 +26,10 @@ import (
 	"github.com/J-Siu/yt-toolbox/lib"
 )
 
+const (
+	Version = "v0.6.0"
+)
+
 var (
 	Conf         lib.TypeConf
 	Flag         lib.TypeFlag

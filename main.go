@@ -23,11 +23,9 @@ THE SOFTWARE.
 package main
 
 import (
-	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/yt-toolbox/cmd"
 )
 
 func main() {
-	ezlog.SetLogLevel(ezlog.ERR)
 	cmd.Execute()
 }

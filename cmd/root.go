@@ -27,7 +27,6 @@ import (
 
 	"github.com/J-Siu/go-helper/v2/errs"
 	"github.com/J-Siu/go-helper/v2/ezlog"
-	"github.com/J-Siu/go-helper/v2/ver"
 	"github.com/J-Siu/yt-toolbox/global"
 	"github.com/J-Siu/yt-toolbox/lib"
 	"github.com/spf13/cobra"
@@ -35,9 +34,8 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:     "yt-toolbox",
-	Aliases: []string{"gyt"},
 	Short:   "YouTube toolbox",
-	Version: ver.M(0).N(0).P(5).String(),
+	Version: global.Version,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if global.Flag.Debug {
 			ezlog.SetLogLevel(ezlog.DEBUG)
@@ -45,8 +43,20 @@ var rootCmd = &cobra.Command{
 		if global.Flag.Trace {
 			ezlog.SetLogLevel(ezlog.TRACE)
 		}
-		ezlog.Debug().N("Version").Mn("global.Version").Nn("Flag").M(&global.Flag).Out()
+		host, _ := cmd.Flags().GetString("host")
+		port, _ := cmd.Flags().GetUint("port")
+		ezlog.Debug().
+			N("Version").Mn(global.Version).
+			Nn("Flag").M(&global.Flag).
+			Out()
 		global.Conf.New()
+		// -- Flags override default and config
+		if len(host) > 0 {
+			global.Conf.DevtoolsHost = host
+		}
+		if port > 0 {
+			global.Conf.DevtoolsPort = int(port)
+		}
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if !errs.IsEmpty() {
@@ -67,14 +77,12 @@ func Execute() {
 func init() {
 	cmd := rootCmd
 	cmd.PersistentFlags().BoolVarP(&global.Flag.Debug, "debug", "", false, "Enable debug")
-	cmd.PersistentFlags().BoolVarP(&global.Flag.Trace, "trace", "", false, "Enable trace (include debug)")
+	cmd.PersistentFlags().BoolVarP(&global.Flag.Trace, "trace", "t", false, "Enable trace (include debug)")
 	cmd.PersistentFlags().BoolVarP(&global.Flag.Verbose, "verbose", "v", false, "Verbose")
 	cmd.PersistentFlags().StringVarP(&global.Conf.FileConf, "config", "c", lib.ConfDefault.FileConf, "Config file")
 
 	cmd.PersistentFlags().IntVarP(&global.Flag.ScrollMax, "scroll-max", "s", 0, "Unlimited -1")
 
-	cmd.PersistentFlags().String("DevToolsHost", "", "Devtools Host")
-	cmd.PersistentFlags().String("DevToolsUrl", "", "Devtools Url (override Devtools host, ver and port)")
-	cmd.PersistentFlags().String("DevToolsVer", "", "Devtools Version")
-	cmd.PersistentFlags().Int("DevToolsPort", 9222, "Devtools Port")
+	cmd.PersistentFlags().Uint("port", 0, "Devtools Port")
+	cmd.PersistentFlags().String("host", "", "Devtools Host")
 }
