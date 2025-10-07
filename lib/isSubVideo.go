@@ -23,6 +23,9 @@ THE SOFTWARE.
 package lib
 
 import (
+	"regexp"
+	"strconv"
+
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-helper/v2/str"
 	"github.com/J-Siu/go-is"
@@ -32,10 +35,11 @@ import (
 type IsSubVideo struct {
 	*is.Processor
 
-	Day int
+	Scroll bool
+	Day    uint
 }
 
-func (s *IsSubVideo) New(page *rod.Page, urlStr string, scrollMax int) *IsSubVideo {
+func (t *IsSubVideo) New(page *rod.Page, urlStr string, scrollMax int, day uint) *IsSubVideo {
 	property := is.Property{
 		IInfoList: new(is.IInfoList),
 		Page:      page,
@@ -43,25 +47,31 @@ func (s *IsSubVideo) New(page *rod.Page, urlStr string, scrollMax int) *IsSubVid
 		UrlLoad:   true,
 		UrlStr:    urlStr,
 	}
-	s.Processor = is.New(&property) // Init the base struct
-	s.MyType = "IsSubVideo"
-	prefix := s.MyType + ".New"
+	t.Processor = is.New(&property) // Init the base struct
+	t.MyType = "IsSubVideo"
+	prefix := t.MyType + ".New"
+	t.Day = day
+	t.override()
 
-	s.override()
-
-	ezlog.Trace().N(prefix).M("Done")
-	return s
+	// ezlog.Trace().N(prefix).M("Done")
+	ezlog.Trace().Nn(prefix).M(t).Out()
+	return t
 }
 
-func (s *IsSubVideo) override() {
-	s.V020_Elements = func(element *rod.Element) *rod.Elements {
-		prefix := s.MyType + ".V020_Elements"
+func (t *IsSubVideo) Run() *IsSubVideo {
+	t.Processor.Run()
+	return t
+}
+
+func (t *IsSubVideo) override() {
+	t.V020_Elements = func(element *rod.Element) *rod.Elements {
+		prefix := t.MyType + ".V020_Elements"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		var elements rod.Elements
 		tagName := "ytd-rich-item-renderer"
-		s.Page.MustElement(tagName)
-		elements = s.Page.MustElements(tagName)
+		t.Page.MustElement(tagName)
+		elements = t.Page.MustElements(tagName)
 		ezlog.Debug().N(prefix).N("elements count").M(len(elements)).Out()
 
 		ezlog.Trace().N(prefix).TxtEnd().Out()
@@ -69,8 +79,8 @@ func (s *IsSubVideo) override() {
 	}
 
 	// [element] : "ytd-rich-item-renderer" element from V20_elements()
-	s.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
-		prefix := s.MyType + ".V030_ElementInfo"
+	t.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
+		prefix := t.MyType + ".V030_ElementInfo"
 		ezlog.Trace().N(prefix).TxtStart().Out()
 
 		if element != nil {
@@ -101,6 +111,7 @@ func (s *IsSubVideo) override() {
 						text := eRole.MustText()
 						if !str.ContainsAnySubStringsBool(&text, &excludeText) {
 							info.Text = text
+							t.dayScroll(&text)
 						}
 						// search for watching, minutes, hours, day, <date>
 					}
@@ -119,5 +130,103 @@ func (s *IsSubVideo) override() {
 		}
 		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return infoP
+	}
+
+	t.V100_ScrollLoopEnd = func(state *is.State) {
+		if t.Day > 0 && t.Scroll {
+			t.ScrollMax = -1
+		} else {
+			t.ScrollMax = 0
+		}
+	}
+}
+
+func (t *IsSubVideo) dayScroll(text *string) {
+	// only calculate if t.Day > 0
+	if t.Day > 0 {
+		prefix := t.MyType + ".dayScroll"
+
+		var (
+			day     uint64
+			pattern string
+			matches [][]string
+			re      *regexp.Regexp
+			e       error
+		)
+		// only update t.scroll if text is time
+		ezlog.Trace().N(prefix).N("text").M(*text).Out()
+
+		// Following count as 1 day: hour, now, second
+		pattern = `(\d+) (now?|hour?|minute?|second?)`
+		re = regexp.MustCompile(pattern)
+		matches = re.FindAllStringSubmatch(*text, -1)
+		if len(matches) > 0 {
+			ezlog.Trace().N(prefix).M("1 day").Out()
+			day = 1
+		}
+
+		// # day
+		if day == 0 {
+			pattern = `(\d+) (day.*)`
+			re = regexp.MustCompile(pattern)
+			matches = re.FindAllStringSubmatch(*text, -1)
+			ezlog.Trace().N(prefix).N("day matches").M(matches).Out()
+			if len(matches) > 0 {
+				ezlog.Trace().N(prefix).M("day").Out()
+				day, e = strconv.ParseUint(matches[0][1], 10, 64)
+				if e != nil {
+					ezlog.Err().M(e).Out()
+					day = 0
+				}
+			}
+		}
+		// # week
+		if day == 0 {
+			pattern = `(\d+) (week.*)`
+			re = regexp.MustCompile(pattern)
+			matches = re.FindAllStringSubmatch(*text, -1)
+			ezlog.Trace().N(prefix).N("week matches").M(matches).Out()
+			if len(matches) > 0 {
+				ezlog.Trace().N(prefix).M("week").Out()
+				day, e = strconv.ParseUint(matches[0][1], 10, 64)
+				if e == nil {
+					day *= 7
+				}
+			}
+		}
+		// # month
+		if day == 0 {
+			pattern = `(\d+) (month.*)`
+			re = regexp.MustCompile(pattern)
+			matches = re.FindAllStringSubmatch(*text, -1)
+			ezlog.Trace().N(prefix).N("month matches").M(matches).Out()
+			if len(matches) > 0 {
+				ezlog.Trace().N(prefix).M("month").Out()
+				day, e = strconv.ParseUint(matches[0][1], 10, 64)
+				if e == nil {
+					day *= 30
+				}
+			}
+		}
+		// # year
+		if day == 0 {
+			pattern = `(\d+) (year.*)`
+			re = regexp.MustCompile(pattern)
+			matches = re.FindAllStringSubmatch(*text, -1)
+			ezlog.Trace().N(prefix).N("year matches").M(matches).Out()
+			if len(matches) > 0 {
+				ezlog.Trace().N(prefix).M("year").Out()
+				day, e = strconv.ParseUint(matches[0][1], 10, 64)
+				if e == nil {
+					day *= 365
+				}
+			}
+		}
+
+		t.Scroll = true
+		if day > uint64(t.Day) {
+			t.Scroll = false
+		}
+		ezlog.Trace().N(prefix).N("day").M(day).N("scroll").M(t.Scroll).Out()
 	}
 }

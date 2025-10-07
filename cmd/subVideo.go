@@ -37,12 +37,13 @@ var subVideoCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		page := lib.GetTab(global.Conf.DevtoolsHost, global.Conf.DevtoolsPort)
 
-		isSubVideo := new(lib.IsSubVideo)
-		isSubVideo.
+		isSubVideo := new(lib.IsSubVideo).
 			New(
 				page,
 				lib.UrlYT.SubVideos,
-				global.Flag.ScrollMax).
+				global.Flag.ScrollMax,
+				global.FlagSub.Day,
+			).
 			Run()
 		if isSubVideo.Err == nil {
 			isSubVideo.IInfoList.Print(is.PrintAll)
@@ -54,5 +55,5 @@ func init() {
 	cmd := subVideoCmd
 	subscriptionsCmd.AddCommand(cmd)
 
-	cmd.Flags().IntVarP(&global.FlagSub.Day, "day", "d", 0, "number of days (0 is today only)")
+	cmd.Flags().UintVarP(&global.FlagSub.Day, "day", "d", 0, "number of days (override scroll)")
 }
