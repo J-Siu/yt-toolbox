@@ -128,7 +128,7 @@ func (t *IsHistoryVideo) override() {
 		info := infoP.(*YT_Info)
 		chkStr := info.Title + " " + info.Text + " " + info.ChName + " " + info.ChUrlShort
 
-		matched, matchedStr = str.ContainsAnySubStrings(&chkStr, &t.Filter)
+		matched, matchedStr = str.ContainsAnySubStrings(&chkStr, &t.Filter, false)
 
 		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return matched, matchedStr

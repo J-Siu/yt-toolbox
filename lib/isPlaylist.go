@@ -124,11 +124,11 @@ func (t *IsPlaylist) override() {
 		yt_Info := info.(*YT_Info)
 		matched = true // default to matched
 		if len(*t.Include) != 0 {
-			matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, t.Include)
+			matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, t.Include, false)
 		}
 		// Exclude override Include
 		if len(*t.Exclude) != 0 {
-			matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, t.Exclude)
+			matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, t.Exclude, false)
 			if matched {
 				matched = false
 			}

@@ -100,7 +100,7 @@ func (t *IsHistorySection) override() {
 			for j, item := range elements {
 				title := item.MustText()
 				tmp := "## Section[" + *strany.Any(index) + "] Title[" + *strany.Any(j) + "]"
-				ezlog.Log().Ln().N(tmp).M(title).Out()
+				ezlog.Log().L().N(tmp).M(title).Out()
 				info.Titles = append(info.Titles, title)
 			}
 			if len(info.Titles) == 0 {
