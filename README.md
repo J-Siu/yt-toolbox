@@ -58,6 +58,9 @@ Use "yt-toolbox [command] --help" for more information about a command.
   - Update go-is, go-dtquery, go-helper
 - v0.6.0
   - Add day support for subscription video
+- v0.7.0
+  - Add Github actions
+  - Update go-is, go-dtquery, go-helper
 
 ### License
 

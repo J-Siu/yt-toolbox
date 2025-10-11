@@ -22,14 +22,6 @@ THE SOFTWARE.
 
 package global
 
-import (
-	"github.com/J-Siu/yt-toolbox/lib"
-)
-
-var (
-	Conf         lib.TypeConf
-	Flag         lib.TypeFlag
-	FlagHistory  lib.TypeFlagHistory
-	FlagPlaylist lib.TypeFlagPlaylist
-	FlagSub      lib.TypeFlagSub
+const (
+	Version = "v0.7.0"
 )
