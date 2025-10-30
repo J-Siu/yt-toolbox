@@ -5,7 +5,6 @@ A command line program to extract youtube subscriptions, playlist and history. U
 - [Install](#install)
 - [Usage](#usage)
 - [Limitation](#limitation)
-- [Change Log](#change-log)
 - [License](#license)
 <!--more-->
 
@@ -70,16 +69,6 @@ Use "yt-toolbox [command] --help" for more information about a command.
 
 2. Login youtube.com
 3. Run yt-toolbox
-
-### Change Log
-
-- v0.5.0
-  - Update go-is, go-dtquery, go-helper
-- v0.6.0
-  - Add day support for subscription video
-- v0.7.0
-  - Add Github actions
-  - Update go-is, go-dtquery, go-helper
 
 ### License
 

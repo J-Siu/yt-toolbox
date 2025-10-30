@@ -65,7 +65,7 @@ func GetTab(host string, port int) *rod.Page {
 	devtools := dq.Get(host, port)
 	err = devtools.Err
 	if err == nil {
-		browser = rod.New().ControlURL(devtools.Ver.WsUrl)
+		browser = rod.New().ControlURL(devtools.DT_Url)
 		err = browser.Connect()
 	}
 	if err == nil {

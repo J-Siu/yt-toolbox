@@ -1,0 +1,10 @@
+- v0.5.0
+  - update go-is, go-dtquery, go-helper
+- v0.6.0
+  - add day support for subscription video
+- v0.7.0
+  - add Github actions
+  - update go-is, go-dtquery, go-helper
+- v0.8.0
+  - split CHANGELOG.md from README.md
+  - update go-is, go-dtquery, go-helper
