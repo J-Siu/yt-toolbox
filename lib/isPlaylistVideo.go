@@ -59,7 +59,7 @@ func (t *IsPlaylistVideo) override() {
 		ezlog.Trace().N(prefix).TxtStart().Out()
 		tagName := "ytd-playlist-video-list-renderer"
 		element := t.Page.MustElement(tagName)
-		ezlog.Debug().N(prefix).Nn(tagName).M(element).Out()
+		ezlog.Debug().N(prefix).N(tagName).Lm(element).Out()
 
 		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return element

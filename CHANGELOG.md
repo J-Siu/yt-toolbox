@@ -8,3 +8,5 @@
 - v0.8.0
   - split CHANGELOG.md from README.md
   - update go-is, go-dtquery, go-helper
+- v0.8.1
+  - update go-is, go-dtquery, go-helper

@@ -54,7 +54,7 @@ func (t *IsSubVideo) New(page *rod.Page, urlStr string, scrollMax int, day uint)
 	t.override()
 
 	// ezlog.Trace().N(prefix).M("Done")
-	ezlog.Trace().Nn(prefix).M(t).Out()
+	ezlog.Trace().N(prefix).Lm(t).Out()
 	return t
 }
 
@@ -125,7 +125,7 @@ func (t *IsSubVideo) override() {
 				// }
 			}
 			// ---
-			ezlog.Debug().Nn(prefix).M(info).Out()
+			ezlog.Debug().N(prefix).Lm(info).Out()
 			infoP = &info
 		}
 		ezlog.Trace().N(prefix).TxtEnd().Out()

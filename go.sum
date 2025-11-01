@@ -1,9 +1,9 @@
-github.com/J-Siu/go-dtquery v1.2.0 h1:kLJ39ibAeVvwQuH+xziI5P5mxAMQo65Sn+ZwyUUF5HI=
-github.com/J-Siu/go-dtquery v1.2.0/go.mod h1:HPcS6B0+EVftrkKdM71Fh1crw7F0o3INJ+iPXx9/AGs=
-github.com/J-Siu/go-helper/v2 v2.5.5 h1:1JQmIZKY3yLi8jVAR/XcYLK25Cv6s3jImnjqOwN+oYg=
-github.com/J-Siu/go-helper/v2 v2.5.5/go.mod h1:+CK0US3v4tq3m8A+97mQfpWXt0mnm/synBhgfwj+sXI=
-github.com/J-Siu/go-is v1.1.9 h1:xCR+KcojIguzmBH//LDFeFgVcmoDInFXJFKOLnaoPGs=
-github.com/J-Siu/go-is v1.1.9/go.mod h1:EsataHa43gZDWgshreALHuZpxahlgPtZwAv51TlAvqQ=
+github.com/J-Siu/go-dtquery v1.2.1 h1:KjHurf9UGHCmRJzkLFClYRIxoSVQcfd22zGunj/4L1k=
+github.com/J-Siu/go-dtquery v1.2.1/go.mod h1:k0amnLPMgrgcJX8YP6f2PRqWVxEfw7RYjk7cefj+G28=
+github.com/J-Siu/go-helper/v2 v2.6.0 h1:RI/TbmaHpkzJkPPUQ9hCeRw7NdJwHHzJ4rbT8MXrEVU=
+github.com/J-Siu/go-helper/v2 v2.6.0/go.mod h1:E4Z/J6PPW8Tknvef+sGla1h3OVQb0fHbVdpH/zZBVvg=
+github.com/J-Siu/go-is v1.1.10 h1:ietIXfLGYL1kAf8shpAnauNc8wRtNzGPvLkI339bipc=
+github.com/J-Siu/go-is v1.1.10/go.mod h1:c/9r9nHwuDLXPnXkPo0NeexK3VGI8KbTahNrD45hIRY=
 github.com/charlievieth/strcase v0.0.5 h1:gV4iXVyD6eI5KdfOV+/vIVCKXZwtCWOmDMcu7Uy00Rs=
 github.com/charlievieth/strcase v0.0.5/go.mod h1:FIOYY1aDBMSIOFqmVomHBpoK+bteGlESRsgsdWjrhx8=
 github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=

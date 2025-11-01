@@ -46,8 +46,8 @@ var rootCmd = &cobra.Command{
 		host, _ := cmd.Flags().GetString("host")
 		port, _ := cmd.Flags().GetUint("port")
 		ezlog.Debug().
-			N("Version").Mn(global.Version).
-			Nn("Flag").M(&global.Flag).
+			N("Version").M(global.Version).
+			Ln("Flag").Lm(&global.Flag).
 			Out()
 		global.Conf.New()
 		// -- Flags override default and config

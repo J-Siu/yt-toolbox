@@ -53,7 +53,7 @@ func (t *IsPlaylist) New(page *rod.Page, urlStr string, scrollMax int, exclude *
 	t.Exclude = exclude
 	t.Include = include
 
-	ezlog.Debug().Nn(prefix).M(t).Out()
+	ezlog.Debug().N(prefix).Lm(t).Out()
 	t.override()
 
 	return t
@@ -71,7 +71,7 @@ func (t *IsPlaylist) override() {
 		byId := "#contents"
 		e := t.Page.MustElement(byId) // by id
 		if ezlog.GetLogLevel() == ezlog.TRACE {
-			ezlog.Trace().N(prefix).Mn(byId).M(e.MustHTML()).Out()
+			ezlog.Trace().N(prefix).M(byId).Lm(e.MustHTML()).Out()
 		}
 		ezlog.Trace().N(prefix).TxtEnd().Out()
 		return e
@@ -95,7 +95,7 @@ func (t *IsPlaylist) override() {
 		if element != nil {
 			var info YT_Info
 			if ezlog.GetLogLevel() == ezlog.TRACE {
-				ezlog.Trace().N(prefix).Nn("element").M(element.MustHTML()).Out()
+				ezlog.Trace().N(prefix).N("element").Lm(element.MustHTML()).Out()
 			}
 			h3 := element.MustElement("h3")
 			if h3 != nil {
@@ -107,7 +107,7 @@ func (t *IsPlaylist) override() {
 			for _, s := range es {
 				if s.MustText() == "View full playlist" {
 					if ezlog.GetLogLevel() == ezlog.TRACE {
-						ezlog.Trace().N(prefix).Nn(tagName).M(s.MustHTML()).Out()
+						ezlog.Trace().N(prefix).N(tagName).Lm(s.MustHTML()).Out()
 					}
 					info.Url = UrlYT.Base + *(s.MustAttribute("href"))
 				}
