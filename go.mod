@@ -3,11 +3,11 @@ module github.com/J-Siu/yt-toolbox
 go 1.25.1
 
 require (
-	github.com/J-Siu/go-dtquery v1.2.1
-	github.com/J-Siu/go-helper/v2 v2.6.0
-	github.com/J-Siu/go-is v1.1.10
+	github.com/J-Siu/go-dtquery v1.2.2
+	github.com/J-Siu/go-helper/v2 v2.6.5
+	github.com/J-Siu/go-is v1.1.11
 	github.com/go-rod/rod v0.116.2
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 )
 
@@ -25,11 +25,11 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/ysmood/fetchup v0.3.0 // indirect
 	github.com/ysmood/goob v0.4.0 // indirect
-	github.com/ysmood/got v0.41.0 // indirect
+	github.com/ysmood/got v0.42.3 // indirect
 	github.com/ysmood/gson v0.7.3 // indirect
 	github.com/ysmood/leakless v0.9.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/sys v0.37.0 // indirect
-	golang.org/x/text v0.30.0 // indirect
+	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/text v0.32.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
