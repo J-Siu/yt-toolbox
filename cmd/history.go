@@ -23,8 +23,8 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/J-Siu/yt-toolbox/global"
-	"github.com/J-Siu/yt-toolbox/lib"
+	"github.com/J-Siu/yt-toolbox/v2/global"
+	"github.com/J-Siu/yt-toolbox/v2/lib"
 	"github.com/spf13/cobra"
 )
 

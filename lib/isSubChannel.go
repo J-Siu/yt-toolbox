@@ -24,7 +24,7 @@ package lib
 
 import (
 	"github.com/J-Siu/go-helper/v2/ezlog"
-	"github.com/J-Siu/go-is"
+	"github.com/J-Siu/go-is/v2/is"
 	"github.com/go-rod/rod"
 )
 
@@ -52,35 +52,38 @@ func (t *IsSubChannel) Run() *IsSubChannel {
 	return t
 }
 
-func (s *IsSubChannel) override() {
-	s.V020_Elements = func(element *rod.Element) *rod.Elements {
-		prefix := s.MyType + ".V020_Elements"
-		ezlog.Trace().N(prefix).TxtStart().Out()
+func (t *IsSubChannel) override() {
+	t.V020_Elements = t.override_V020_Elements
+	t.V030_ElementInfo = t.override_V030_ElementInfo
+}
 
-		var elements rod.Elements
-		s.Page.MustElement("#content-section").MustWaitVisible()
-		elements = s.Page.MustElements("#content-section")
+func (t *IsSubChannel) override_V020_Elements(element *rod.Element) *rod.Elements {
+	prefix := t.MyType + ".V020_Elements"
+	ezlog.Trace().N(prefix).TxtStart().Out()
 
-		ezlog.Trace().N(prefix).TxtEnd().Out()
-		return &elements
+	var elements rod.Elements
+	t.Page.MustElement("#content-section").MustWaitVisible()
+	elements = t.Page.MustElements("#content-section")
+
+	ezlog.Trace().N(prefix).TxtEnd().Out()
+	return &elements
+}
+
+func (t *IsSubChannel) override_V030_ElementInfo() (infoP is.IInfo) {
+	prefix := t.MyType + ".V030_ElementInfo"
+	ezlog.Trace().N(prefix).TxtStart().Out()
+
+	if t.StateCurr.Element != nil {
+		var info YT_Info
+		var title string
+		var urlPath *string
+		title = t.StateCurr.Element.MustElement("#text").MustText()
+		urlPath = t.StateCurr.Element.MustElement("#main-link").MustAttribute("href")
+		info.Title = title
+		info.Url = UrlYT.Base + *urlPath
+		ezlog.Debug().N(prefix).M(info.String()).Out()
+		infoP = &info
 	}
-
-	s.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
-		prefix := s.MyType + ".V030_ElementInfo"
-		ezlog.Trace().N(prefix).TxtStart().Out()
-
-		if element != nil {
-			var info YT_Info
-			var title string
-			var urlPath *string
-			title = element.MustElement("#text").MustText()
-			urlPath = element.MustElement("#main-link").MustAttribute("href")
-			info.Title = title
-			info.Url = UrlYT.Base + *urlPath
-			ezlog.Debug().N(prefix).M(info.String()).Out()
-			infoP = &info
-		}
-		ezlog.Trace().N(prefix).TxtEnd().Out()
-		return infoP
-	}
+	ezlog.Trace().N(prefix).TxtEnd().Out()
+	return infoP
 }

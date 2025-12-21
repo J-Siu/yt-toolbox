@@ -10,3 +10,5 @@
   - update go-is, go-dtquery, go-helper
 - v0.8.1
   - update go-is, go-dtquery, go-helper
+- v2.0.0
+  - update go-is to v2

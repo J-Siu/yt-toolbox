@@ -25,10 +25,11 @@ package lib
 import (
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-helper/v2/strany"
-	"github.com/J-Siu/go-is"
+	"github.com/J-Siu/go-is/v2/is"
 	"github.com/go-rod/rod"
 )
 
+// Process YT History by sections
 type IsHistorySection struct {
 	*is.Processor
 
@@ -66,100 +67,109 @@ func (t *IsHistorySection) Run() *IsHistorySection {
 }
 
 func (t *IsHistorySection) override() {
-	t.V020_Elements = func(element *rod.Element) *rod.Elements {
-		prefix := t.MyType + ".V020_Elements"
-		ezlog.Trace().N(prefix).TxtStart().Out()
+	t.V020_Elements = t.override_V020_Elements
+	t.V030_ElementInfo = t.override_V030_ElementInfo
+	t.V070_ElementProcess = t.override_V070_ElementProcess
+	t.V100_ScrollLoopEnd = t.override_V100_ScrollLoopEnd
+}
 
-		var tagName = "ytd-item-section-renderer"
-		e := t.Page.MustElement(tagName)
-		ezlog.Trace().N(prefix).N("MustWaitDOMStable").TxtStart().Out()
-		e.MustWaitVisible()
-		ezlog.Trace().N(prefix).N("MustWaitDOMStable").TxtEnd().Out()
-		elements := t.Page.MustElements(tagName)
-		ezlog.Trace().N(prefix).N(tagName).N("element count").M(len(elements)).Out()
+func (t *IsHistorySection) override_V020_Elements(element *rod.Element) *rod.Elements {
+	prefix := t.MyType + ".V020_Elements"
+	ezlog.Trace().N(prefix).TxtStart().Out()
 
-		ezlog.Trace().N(prefix).TxtEnd().Out()
-		return &elements
-	}
+	var tagName = "ytd-item-section-renderer"
+	e := t.Page.MustElement(tagName)
+	ezlog.Trace().N(prefix).N("MustWaitDOMStable").TxtStart().Out()
+	e.MustWaitVisible()
+	ezlog.Trace().N(prefix).N("MustWaitDOMStable").TxtEnd().Out()
+	elements := t.Page.MustElements(tagName)
+	ezlog.Trace().N(prefix).N(tagName).N("element count").M(len(elements)).Out()
 
-	t.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
-		prefix := t.MyType + ".V030_ElementInfo"
-		ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Trace().N(prefix).TxtEnd().Out()
+	return &elements
+}
 
-		if element != nil {
-			var (
-				info     YT_Info
-				elements rod.Elements
-				byId     = "#title"
-			)
-			elements, t.Err = element.Elements(byId)
-			if t.Err != nil {
-				ezlog.Err().N(prefix).M(t.Err).Out()
-			}
+func (t *IsHistorySection) override_V030_ElementInfo() (infoP is.IInfo) {
+	prefix := t.MyType + ".V030_ElementInfo"
+	ezlog.Trace().N(prefix).TxtStart().Out()
 
-			for j, item := range elements {
-				title := item.MustText()
-				tmp := "## Section[" + *strany.Any(index) + "] Title[" + *strany.Any(j) + "]"
-				ezlog.Log().L().N(tmp).M(title).Out()
-				info.Titles = append(info.Titles, title)
-			}
-			if len(info.Titles) == 0 {
-				info.Titles = []string{""}
-			}
-			infoP = &info
+	if t.StateCurr.Element != nil {
+		var (
+			info     YT_Info
+			elements rod.Elements
+			byId     = "#title"
+		)
+		elements, t.Err = t.StateCurr.Element.Elements(byId)
+		if t.Err != nil {
+			ezlog.Err().N(prefix).M(t.Err).Out()
 		}
 
-		ezlog.Trace().N(prefix).TxtEnd().Out()
-		return infoP
+		for j, item := range elements {
+			title := item.MustText()
+			tmp := "## Section[" + *strany.Any(t.StateCurr.ElementIndex) + "] Title[" + *strany.Any(j) + "]"
+			ezlog.Log().L().N(tmp).M(title).Out()
+			info.Titles = append(info.Titles, title)
+		}
+		if len(info.Titles) == 0 {
+			info.Titles = []string{""}
+		}
+		infoP = &info
 	}
 
-	t.V070_ElementProcess = func(element *rod.Element, index int, infoP is.IInfo) {
-		prefix := t.MyType + ".V070_ElementProcess"
-		ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Trace().N(prefix).TxtEnd().Out()
+	return infoP
+}
 
-		titles := &infoP.(*YT_Info).Titles
-		if len(*titles) != 0 && len((*titles)[0]) != 0 {
-			var isHistoryVideo IsHistoryVideo
-			property := is.Property{
-				Container: element,
+func (t *IsHistorySection) override_V070_ElementProcess() {
+	prefix := t.MyType + ".V070_ElementProcess"
+	ezlog.Trace().N(prefix).TxtStart().Out()
+
+	titles := t.StateCurr.ElementInfo.(*YT_Info).Titles
+	if len(titles) != 0 && len((titles)[0]) != 0 {
+		var (
+			isHistoryEntry IsHistoryEntry
+			mode           is.IInfoListPrintMode
+			property       = is.Property{
+				Container: t.StateCurr.Element,
 				IInfoList: new(is.IInfoList),
 				Page:      t.Page,
 			}
-
-			isHistoryVideo.New(&property, t.Del, t.Remove, &t.Filter).Run()
-			var mode is.IInfoListPrintMode
-			if t.Verbose {
-				mode = is.PrintAll
-			} else {
-				mode = is.PrintMatched
-			}
-			isHistoryVideo.IInfoList.Print(mode)
+		)
+		isHistoryEntry.New(&property, t.Del, t.Remove, &t.Filter).Run()
+		if t.Verbose {
+			mode = is.PrintAll
+		} else {
+			mode = is.PrintMatched
 		}
-
-		ezlog.Trace().N(prefix).TxtEnd().Out()
+		ezlog.Log().M("#|match|video|ch|desc").Out()
+		ezlog.Log().M("--|--|--|--|--").Out()
+		isHistoryEntry.IInfoList.Print(mode)
 	}
 
-	t.V100_ScrollLoopEnd = func(state *is.State) {
-		prefix := t.MyType + "V100_ScrollLoopEnd"
-		ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Trace().N(prefix).TxtEnd().Out()
+}
 
-		if t.Remove {
-			t.removeSpinningWheel()
-			if state.Elements != nil {
-				for _, e := range *state.Elements {
-					e.Remove()
-				}
+func (t *IsHistorySection) override_V100_ScrollLoopEnd() {
+	prefix := t.MyType + "V100_ScrollLoopEnd"
+	ezlog.Trace().N(prefix).TxtStart().Out()
+
+	if t.Remove {
+		t.removeSpinningWheel()
+		if t.StateCurr.Elements != nil {
+			for _, e := range *t.StateCurr.Elements {
+				e.Remove()
 			}
-			state.ElementCountLast = 0
-			state.ElementLast = nil
 		}
-		state.Scroll = true
-		ezlog.Trace().N(prefix).N("MustWaitLoad").TxtStart().Out()
-		t.Page.MustWaitLoad()
-		ezlog.Trace().N(prefix).N("MustWaitLoad").TxtEnd().Out()
-
-		ezlog.Trace().N(prefix).TxtEnd().Out()
+		t.StateCurr.ElementsCount = 0
+		t.StateCurr.Element = nil
+		t.StateCurr.ScrollableElement = nil
 	}
+	t.StateCurr.Scroll = true
+	ezlog.Trace().N(prefix).N("MustWaitLoad").TxtStart().Out()
+	t.Page.MustWaitLoad()
+	ezlog.Trace().N(prefix).N("MustWaitLoad").TxtEnd().Out()
+
+	ezlog.Trace().N(prefix).TxtEnd().Out()
 }
 
 func (t *IsHistorySection) removeSpinningWheel() {

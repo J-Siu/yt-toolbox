@@ -28,15 +28,13 @@ import (
 
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-helper/v2/str"
-	"github.com/J-Siu/go-is"
+	"github.com/J-Siu/go-is/v2/is"
 	"github.com/go-rod/rod"
 )
 
 type IsSubVideo struct {
 	*is.Processor
-
-	Scroll bool
-	Day    uint
+	Day uint
 }
 
 func (t *IsSubVideo) New(page *rod.Page, urlStr string, scrollMax int, day uint) *IsSubVideo {
@@ -64,48 +62,54 @@ func (t *IsSubVideo) Run() *IsSubVideo {
 }
 
 func (t *IsSubVideo) override() {
-	t.V020_Elements = func(element *rod.Element) *rod.Elements {
-		prefix := t.MyType + ".V020_Elements"
-		ezlog.Trace().N(prefix).TxtStart().Out()
+	t.V020_Elements = t.override_V020_Elements
+	t.V030_ElementInfo = t.override_V030_ElementInfo
+	t.V100_ScrollLoopEnd = t.override_V100_ScrollLoopEnd
+}
 
-		var elements rod.Elements
-		tagName := "ytd-rich-item-renderer"
-		t.Page.MustElement(tagName)
-		elements = t.Page.MustElements(tagName)
-		ezlog.Debug().N(prefix).N("elements count").M(len(elements)).Out()
+func (t *IsSubVideo) override_V020_Elements(element *rod.Element) *rod.Elements {
+	prefix := t.MyType + ".V020_Elements"
+	ezlog.Trace().N(prefix).TxtStart().Out()
 
-		ezlog.Trace().N(prefix).TxtEnd().Out()
-		return &elements
-	}
+	var elements rod.Elements
+	tagName := "ytd-rich-item-renderer"
+	t.Page.MustElement(tagName)
+	elements = t.Page.MustElements(tagName)
+	ezlog.Debug().N(prefix).N("elements count").M(len(elements)).Out()
 
-	// [element] : "ytd-rich-item-renderer" element from V20_elements()
-	t.V030_ElementInfo = func(element *rod.Element, index int) (infoP is.IInfo) {
-		prefix := t.MyType + ".V030_ElementInfo"
-		ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Trace().N(prefix).TxtEnd().Out()
+	return &elements
+}
 
-		if element != nil {
-			var (
-				info    YT_Info
-				tagName string
-			)
-			// Tile block("h3"): title and link of the video
-			eH3 := element.MustElement("h3")
-			info.Title = eH3.MustText()
-			info.Url = UrlYT.Base + *eH3.MustElement("a").MustAttribute("href")
+// [element] : "ytd-rich-item-renderer" element from V20_elements()
+func (t *IsSubVideo) override_V030_ElementInfo() (infoP is.IInfo) {
+	prefix := t.MyType + ".V030_ElementInfo"
+	ezlog.Trace().N(prefix).TxtStart().Out()
 
-			// Meta element: channel info, views and date
-			tagName = "yt-content-metadata-view-model"
-			eMeta, err := element.Element(tagName)
-			if err == nil && eMeta != nil {
-				// Meta element -> link(<a>) block
-				a := eMeta.MustElement("a")
+	if t.StateCurr.Element != nil {
+		var (
+			info    YT_Info
+			tagName string
+		)
+		// Tile block("h3"): title and link of the video
+		eH3 := t.StateCurr.Element.MustElement("h3")
+		info.Title = eH3.MustText()
+		info.Url = UrlYT.Base + *eH3.MustElement("a").MustAttribute("href")
+
+		// Meta element: channel info, views and date
+		tagName = "yt-content-metadata-view-model"
+		eMeta, err := t.StateCurr.Element.Element(tagName)
+		if err == nil && eMeta != nil {
+			// Meta element -> link(<a>) block
+			a, e2 := eMeta.Element("a")
+			if e2 == nil {
 				info.ChName = a.MustText()
 				info.ChUrlShort = UrlDecode(*a.MustAttribute("href"))
 				info.ChUrl = UrlYT.Base + info.ChUrlShort
 				// Meta element -> elements with [role]='text' attribute
 				tagName = "[role='text']"
-				eRoles, err := eMeta.Elements(tagName)
-				if err == nil {
+				eRoles, e3 := eMeta.Elements(tagName)
+				if e3 == nil {
 					excludeText := []string{"views", "watch", "scheduled"}
 					for _, eRole := range eRoles {
 						text := eRole.MustText()
@@ -117,27 +121,25 @@ func (t *IsSubVideo) override() {
 					}
 				}
 			}
-			if err != nil {
-				// These are shorts with not meta block
-				info.Text = "Short"
-				// if ezlog.GetLogLevel() == ezlog.TRACE {
-				// 	ezlog.Trace().N(prefix).Nn("Err element").M(element.MustHTML()).Out()
-				// }
-			}
-			// ---
-			ezlog.Debug().N(prefix).Lm(info).Out()
-			infoP = &info
 		}
-		ezlog.Trace().N(prefix).TxtEnd().Out()
-		return infoP
+		if err != nil {
+			// These are shorts with no meta block
+			info.Text = "Short"
+			// if ezlog.GetLogLevel() == ezlog.TRACE {
+			// ezlog.Trace().N(prefix).Ln("Err element").M(gohtml.Format(t.StateCurr.Element.MustHTML())).Out()
+			// }
+		}
+		// ---
+		ezlog.Debug().N(prefix).Lm(info).Out()
+		infoP = &info
 	}
+	ezlog.Trace().N(prefix).TxtEnd().Out()
+	return infoP
+}
 
-	t.V100_ScrollLoopEnd = func(state *is.State) {
-		if t.Day > 0 && t.Scroll {
-			t.ScrollMax = -1
-		} else {
-			t.ScrollMax = 0
-		}
+func (t *IsSubVideo) override_V100_ScrollLoopEnd() {
+	if t.Day > 0 && t.StateCurr.Scroll {
+		t.ScrollMax = -1
 	}
 }
 
@@ -223,10 +225,10 @@ func (t *IsSubVideo) dayScroll(text *string) {
 			}
 		}
 
-		t.Scroll = true
+		t.StateCurr.Scroll = true
 		if day > uint64(t.Day) {
-			t.Scroll = false
+			t.StateCurr.Scroll = false
 		}
-		ezlog.Trace().N(prefix).N("day").M(day).N("scroll").M(t.Scroll).Out()
+		ezlog.Trace().N(prefix).N("day").M(day).N("scroll").M(t.StateCurr.Scroll).Out()
 	}
 }

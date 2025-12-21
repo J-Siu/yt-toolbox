@@ -23,7 +23,7 @@ THE SOFTWARE.
 package main
 
 import (
-	"github.com/J-Siu/yt-toolbox/cmd"
+	"github.com/J-Siu/yt-toolbox/v2/cmd"
 )
 
 func main() {

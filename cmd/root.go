@@ -27,8 +27,8 @@ import (
 
 	"github.com/J-Siu/go-helper/v2/errs"
 	"github.com/J-Siu/go-helper/v2/ezlog"
-	"github.com/J-Siu/yt-toolbox/global"
-	"github.com/J-Siu/yt-toolbox/lib"
+	"github.com/J-Siu/yt-toolbox/v2/global"
+	"github.com/J-Siu/yt-toolbox/v2/lib"
 	"github.com/spf13/cobra"
 )
 
@@ -81,7 +81,7 @@ func init() {
 	cmd.PersistentFlags().BoolVarP(&global.Flag.Verbose, "verbose", "v", false, "Verbose")
 	cmd.PersistentFlags().StringVarP(&global.Conf.FileConf, "config", "c", lib.ConfDefault.FileConf, "Config file")
 
-	cmd.PersistentFlags().IntVarP(&global.Flag.ScrollMax, "scroll-max", "s", 0, "Unlimited -1")
+	cmd.PersistentFlags().IntVarP(&global.Flag.ScrollMax, "scroll-max", "s", 0, "Unlimited -1 (default: 0)")
 
 	cmd.PersistentFlags().Uint("port", 0, "Devtools Port")
 	cmd.PersistentFlags().String("host", "", "Devtools Host")

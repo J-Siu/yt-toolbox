@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 package lib
 
-import is "github.com/J-Siu/go-is"
+import is "github.com/J-Siu/go-is/v2/is"
 
 var (
 	UrlSearch = struct {
@@ -69,5 +69,5 @@ type YT_Info struct {
 }
 
 func (t *YT_Info) String() string {
-	return "[" + t.Title + "](" + UrlDecode(t.Url) + ") | [" + t.ChName + "](" + t.ChUrl + "] | " + t.Text
+	return "[" + t.Title + "](" + UrlDecode(t.Url) + ") | [" + t.ChName + "](" + t.ChUrl + ") | " + t.Text
 }

@@ -23,7 +23,7 @@ THE SOFTWARE.
 package global
 
 import (
-	"github.com/J-Siu/yt-toolbox/lib"
+	"github.com/J-Siu/yt-toolbox/v2/lib"
 )
 
 var (
