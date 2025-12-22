@@ -23,13 +23,17 @@ THE SOFTWARE.
 package lib
 
 import (
+	"math/rand/v2"
 	"net/url"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-helper/v2/str"
 	"github.com/J-Siu/go-is/v2/is"
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/proto"
 	"github.com/yosssi/gohtml"
 )
 
@@ -170,13 +174,9 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() (infoP is.IInfo) {
 			elementMeta, err = t.StateCurr.Element.Element(by)
 			if err == nil {
 				// -- trace
-				if ezlog.GetLogLevel() == ezlog.TRACE {
-					ezlog.Info().N(prefix).
-						// Ln("element").Lm(t.StateCurr.Element).
-						// Ln("html").Lm(gohtml.Format(t.StateCurr.Element.MustHTML())).
-						Ln(by).Lm(gohtml.Format(elementMeta.MustHTML())).
-						Out()
-				}
+				// if ezlog.GetLogLevel() == ezlog.TRACE {
+				// 	traceElement(prefix, by, elementMeta)
+				// }
 				// -- title
 				info.Title = elementMeta.MustElement("a").MustText()
 				info.Url = *elementMeta.MustElement("a").MustAttribute("href")
@@ -237,14 +237,73 @@ func (t *IsHistoryEntry) override_V040_ElementMatch() (matched bool, matchedStr 
 func (t *IsHistoryEntry) override_V050_ElementProcessMatched() {
 	prefix := t.MyType + ".V050_ElementProcessMatched"
 	ezlog.Trace().N(prefix).TxtStart().Out()
-
+	var (
+		button         *rod.Element
+		err            error
+		menu           *rod.Element
+		menuItems      rod.Elements
+		menuItemsCount int
+		tag            string
+		txt            string
+		loop           bool
+		loopCount      int
+	)
 	if t.Del {
-		t.Deleted = true
-		t.StateCurr.Element.MustElement("#top-level-buttons-computed").MustClick()
-		// time.Sleep(time.Duration(s.ClickSleep))
-		ezlog.Debug().N(prefix).M("Deleted").Out()
-	}
+		// -- Old X-button -- START
+		// tag = "#top-level-buttons-computed" // X button
+		// button, err = t.StateCurr.Element.Element(tag)
+		// -- Old X-button -- END
 
+		ezlog.Trace().N(prefix).M("page stable - wait").Out()
+		t.Page.MustWaitStable()
+		ezlog.Trace().N(prefix).M("page stable").Out()
+		tag = "button"                                 // X button gone, 3-dot button
+		button, err = t.StateCurr.Element.Element(tag) // class, the 3-dot button
+		if err == nil {
+			button.MustVisible()
+			ezlog.Trace().N(prefix).M("3-dot clicked - before").Out()
+			button.MustClick() // click to bring up contextual menu
+			ezlog.Trace().N(prefix).M("3-dot clicked - done").Out()
+			tag = "tp-yt-paper-listbox,tp-yt-iron-dropdown"
+			menu, err = t.Page.Element(tag) // tag
+			if err == nil {
+				tag = "ytd-menu-service-item-renderer,yt-list-item-view-model"
+				loop = true
+				for loop {
+					loopCount++
+					menuItems, err = menu.Elements(tag) // tag
+					if err != nil {
+						loop = false
+					} else {
+						menuItemsCount = len(menuItems)
+						loop = menuItemsCount == 0
+						if loop && loopCount == 100 {
+							ezlog.Trace().N(prefix).N("loopCount").M(loopCount).N("menuItems").M(menuItemsCount).Out()
+							os.Exit(1)
+						}
+						if !loop {
+							ezlog.Trace().N(prefix).N("menuItems").M(menuItemsCount).Out()
+						}
+						for _, b := range menuItems {
+							txt = b.MustText()
+							// traceElement(prefix, txt, b)
+							ezlog.Trace().N(prefix).N("menuItems").M(txt).Out()
+							if strings.EqualFold(txt, "Remove from watch history") {
+								elementRandomClick(t.Page, b, 250, 500)
+								ezlog.Trace().N(prefix).N(txt).M("clicked").Out()
+								t.Deleted = true
+								ezlog.Debug().N(prefix).N("Deleted").M(t.Deleted).Out()
+								break
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if err != nil {
+		ezlog.Err().N(prefix).M(err).Out()
+	}
 	ezlog.Trace().N(prefix).TxtEnd().Out()
 }
 
@@ -294,5 +353,41 @@ func (t *IsHistoryEntry) override_V100_ScrollLoopEnd() {
 			ezlog.Trace().N(prefix).N("t.StateCurr.Element").M(string(t.StateCurr.Element.Object.ObjectID)).Out()
 		}
 	}
+	ezlog.Trace().N(prefix).TxtEnd().Out()
+}
+
+func traceElement(prefix, tag string, e *rod.Element) {
+	ezlog.Trace().N(prefix).N(tag).Lm(gohtml.Format(e.MustHTML())).Out()
+}
+
+func elementRandomClick(page *rod.Page, e *rod.Element, min, max int64) {
+	prefix := "elementRandomClick"
+	ezlog.Trace().N(prefix).TxtStart().Out()
+	var (
+		interval int64
+	)
+	traceElement(prefix, "", e)
+	ezlog.Trace().N(prefix).M("page stable - wait").Out()
+	page.MustWaitStable()
+	ezlog.Trace().N(prefix).M("page stable").Out()
+	interval = min + rand.Int64N(max-min)
+	time.Sleep(time.Duration(interval) * time.Millisecond / 2)
+	ezlog.Trace().N(prefix).N("sleep(ms) - before").M(interval).Out()
+	{
+		var (
+			x, y float64
+		)
+		box := e.MustShape().Box()
+		ezlog.Trace().N(prefix).N("box").M(box).Out()
+		x = box.X + 1 + rand.Float64()*(box.Width-2)
+		y = box.Y + 1 + rand.Float64()*(box.Height-2)
+		page.Mouse.MustMoveTo(x, y).MustClick(proto.InputMouseButtonLeft)
+	}
+	{
+		// e.MustClick()
+	}
+	interval = min + rand.Int64N(max-min)
+	time.Sleep(time.Duration(interval) * time.Millisecond / 2)
+	ezlog.Trace().N(prefix).N("sleep(ms) - after").M(interval).Out()
 	ezlog.Trace().N(prefix).TxtEnd().Out()
 }
