@@ -40,7 +40,7 @@ var subChannelCmd = &cobra.Command{
 		isSubCh := new(lib.IsSubChannel).
 			New(
 				page,
-				lib.UrlYT.SubChannels,
+				global.YT_SubChannels,
 				global.Flag.ScrollMax).
 			Run()
 		if isSubCh.Err == nil {

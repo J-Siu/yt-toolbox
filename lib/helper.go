@@ -35,7 +35,7 @@ func UrlDecode(urlIn string) (urlOut string) {
 	if err != nil {
 		urlOut = urlIn
 	}
-	return urlOut
+	return
 }
 
 func UrlCleanup(urlIn string) (urlOut string, err error) {
@@ -53,13 +53,12 @@ func UrlCleanup(urlIn string) (urlOut string, err error) {
 	return urlOut, err
 }
 
-func GetTab(host string, port int) *rod.Page {
+func GetTab(host string, port int) (page *rod.Page) {
 	prefix := "GetTab"
 	ezlog.Trace().N(prefix).TxtStart().Out()
 	var (
 		browser *rod.Browser
 		err     error
-		page    *rod.Page
 		pages   rod.Pages
 	)
 	devtools := dq.Get(host, port)
@@ -82,5 +81,5 @@ func GetTab(host string, port int) *rod.Page {
 		ezlog.Err().N(prefix).M(err).Out()
 	}
 	ezlog.Trace().N(prefix).TxtEnd().Out()
-	return page
+	return
 }

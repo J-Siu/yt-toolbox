@@ -20,26 +20,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package lib
+package conf
 
-import is "github.com/J-Siu/go-is/v2/is"
+// Holding all flags from command line
+type TypeFlag struct {
+	Debug   bool // Enable debug output
+	Trace   bool // Enable trace output
+	Verbose bool
 
-// Embed [is.InfoBase] for [is.IInfo] interface
-type YT_Info struct {
-	is.InfoBase
-
-	// --- Channel info
-	ChName     string `json:"ChName,omitempty"`
-	ChUrl      string `json:"ChUrl,omitempty"`
-	ChUrlShort string `json:"ChUrlShort,omitempty"`
-
-	// --- Video info
-	Text   string   `json:"Text,omitempty"`
-	Title  string   `json:"Title,omitempty"`
-	Titles []string `json:"Titles,omitempty"`
-	Url    string   `json:"Url,omitempty"`
+	ScrollMax int
 }
 
-func (t *YT_Info) String() string {
-	return "[" + t.Title + "](" + UrlDecode(t.Url) + ") | [" + t.ChName + "](" + t.ChUrl + ") | " + t.Text
+type TypeFlagPlaylist struct {
+	GetList bool
+	Exclude []string
+	Include []string
+}
+
+type TypeFlagHistory struct {
+	ClickSleep float32
+	Del        bool
+	Desc       bool
+	Filter     []string
+	NoRemove   bool
+}
+
+type TypeFlagSub struct {
+	Day uint
 }

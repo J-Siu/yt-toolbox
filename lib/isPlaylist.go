@@ -78,7 +78,7 @@ func (t *IsPlaylist) override_V010_Container() *rod.Element {
 	byId := "#contents"
 	e := t.Page.MustElement(byId) // by id
 	if ezlog.GetLogLevel() == ezlog.TRACE {
-		ezlog.Trace().N(prefix).M(byId).Lm(gohtml.Format( e.MustHTML())).Out()
+		ezlog.Trace().N(prefix).M(byId).Lm(gohtml.Format(e.MustHTML())).Out()
 	}
 	ezlog.Trace().N(prefix).TxtEnd().Out()
 	return e
@@ -102,7 +102,7 @@ func (t *IsPlaylist) override_V030_ElementInfo() (infoP is.IInfo) {
 	if t.StateCurr.Element != nil {
 		var info YT_Info
 		if ezlog.GetLogLevel() == ezlog.TRACE {
-			ezlog.Trace().N(prefix).N("element").Lm(gohtml.Format( t.StateCurr.Element.MustHTML())).Out()
+			ezlog.Trace().N(prefix).N("element").Lm(gohtml.Format(t.StateCurr.Element.MustHTML())).Out()
 		}
 		h3 := t.StateCurr.Element.MustElement("h3")
 		if h3 != nil {
@@ -114,9 +114,9 @@ func (t *IsPlaylist) override_V030_ElementInfo() (infoP is.IInfo) {
 		for _, s := range es {
 			if s.MustText() == "View full playlist" {
 				if ezlog.GetLogLevel() == ezlog.TRACE {
-					ezlog.Trace().N(prefix).N(tagName).Lm(gohtml.Format( s.MustHTML())).Out()
+					ezlog.Trace().N(prefix).N(tagName).Lm(gohtml.Format(s.MustHTML())).Out()
 				}
-				info.Url = UrlYT.Base + *(s.MustAttribute("href"))
+				info.Url = *s.MustAttribute("href")
 			}
 		}
 		infoP = &info

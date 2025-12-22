@@ -94,7 +94,7 @@ func (t *IsSubVideo) override_V030_ElementInfo() (infoP is.IInfo) {
 		// Tile block("h3"): title and link of the video
 		eH3 := t.StateCurr.Element.MustElement("h3")
 		info.Title = eH3.MustText()
-		info.Url = UrlYT.Base + *eH3.MustElement("a").MustAttribute("href")
+		info.Url =  *eH3.MustElement("a").MustAttribute("href")
 
 		// Meta element: channel info, views and date
 		tagName = "yt-content-metadata-view-model"
@@ -105,7 +105,7 @@ func (t *IsSubVideo) override_V030_ElementInfo() (infoP is.IInfo) {
 			if e2 == nil {
 				info.ChName = a.MustText()
 				info.ChUrlShort = UrlDecode(*a.MustAttribute("href"))
-				info.ChUrl = UrlYT.Base + info.ChUrlShort
+				info.ChUrl =  info.ChUrlShort
 				// Meta element -> elements with [role]='text' attribute
 				tagName = "[role='text']"
 				eRoles, e3 := eMeta.Elements(tagName)

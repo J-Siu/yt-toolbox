@@ -20,31 +20,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package lib
+package global
 
-// Holding all flags from command line
-type TypeFlag struct {
-	Debug   bool // Enable debug output
-	Trace   bool // Enable trace output
-	Verbose bool
+const (
+	Search_Bing      = "https://www.bing.com"
+	Search_Google    = "https://www.google.com"
+	Search_Kagi      = "https://kagi.com"
+	Search_StartPage = "https://www.startpage.com"
 
-	ScrollMax int
-}
-
-type TypeFlagPlaylist struct {
-	GetList bool
-	Exclude []string
-	Include []string
-}
-
-type TypeFlagHistory struct {
-	ClickSleep float32
-	Del        bool
-	Desc       bool
-	Filter     []string
-	NoRemove   bool
-}
-
-type TypeFlagSub struct {
-	Day uint
-}
+	YT_Base        = "https://www.youtube.com"
+	YT_History     = "https://www.youtube.com/feed/history"
+	YT_Playlists   = "https://www.youtube.com/feed/playlists"
+	YT_SubChannels = "https://www.youtube.com/feed/channels"
+	YT_SubVideos   = "https://www.youtube.com/feed/subscriptions"
+)

@@ -80,7 +80,7 @@ func (t *IsSubChannel) override_V030_ElementInfo() (infoP is.IInfo) {
 		title = t.StateCurr.Element.MustElement("#text").MustText()
 		urlPath = t.StateCurr.Element.MustElement("#main-link").MustAttribute("href")
 		info.Title = title
-		info.Url = UrlYT.Base + *urlPath
+		info.Url =  *urlPath
 		ezlog.Debug().N(prefix).M(info.String()).Out()
 		infoP = &info
 	}

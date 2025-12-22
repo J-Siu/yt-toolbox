@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package lib
+package conf
 
 import (
 	"github.com/J-Siu/go-helper/v2/basestruct"
@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var ConfDefault = TypeConf{
+var Default = TypeConf{
 	FileConf: "$HOME/.config/yt-toolbox.json",
 
 	DevtoolsHost: "localhost",
@@ -47,7 +47,7 @@ type TypeConf struct {
 	DevtoolsPort int    `json:"DevtoolsPort"`
 }
 
-func (t *TypeConf) New() {
+func (t *TypeConf) New() *TypeConf {
 	t.Initialized = true
 	t.MyType = "TypeConf"
 	prefix := t.MyType + ".New"
@@ -60,9 +60,11 @@ func (t *TypeConf) New() {
 
 	t.expand()
 	ezlog.Debug().N(prefix).N("Expand").Lm(t).Out()
+
+	return t
 }
 
-func (t *TypeConf) readFileConf() {
+func (t *TypeConf) readFileConf() *TypeConf {
 	prefix := t.MyType + ".readFileConf"
 
 	viper.SetConfigType("json")
@@ -75,17 +77,20 @@ func (t *TypeConf) readFileConf() {
 	} else {
 		ezlog.Debug().N(prefix).M(t.Err).Out()
 	}
+	return t
 }
 
 // Should be called before reading config file
-func (t *TypeConf) setDefault() {
+func (t *TypeConf) setDefault() *TypeConf {
 	if t.FileConf == "" {
-		t.FileConf = ConfDefault.FileConf
+		t.FileConf = Default.FileConf
 	}
-	t.DevtoolsHost = ConfDefault.DevtoolsHost
-	t.DevtoolsPort = ConfDefault.DevtoolsPort
+	t.DevtoolsHost = Default.DevtoolsHost
+	t.DevtoolsPort = Default.DevtoolsPort
+	return t
 }
 
-func (t *TypeConf) expand() {
+func (t *TypeConf) expand() *TypeConf {
 	t.FileConf = file.TildeEnvExpand(t.FileConf)
+	return t
 }

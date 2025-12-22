@@ -40,7 +40,7 @@ var subVideoCmd = &cobra.Command{
 		isSubVideo := new(lib.IsSubVideo).
 			New(
 				page,
-				lib.UrlYT.SubVideos,
+				global.YT_SubVideos,
 				global.Flag.ScrollMax,
 				global.FlagSub.Day,
 			).

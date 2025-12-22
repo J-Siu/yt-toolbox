@@ -22,14 +22,12 @@ THE SOFTWARE.
 
 package global
 
-import (
-	"github.com/J-Siu/yt-toolbox/v2/lib"
-)
+import "github.com/J-Siu/yt-toolbox/v2/conf"
 
 var (
-	Conf         lib.TypeConf
-	Flag         lib.TypeFlag
-	FlagHistory  lib.TypeFlagHistory
-	FlagPlaylist lib.TypeFlagPlaylist
-	FlagSub      lib.TypeFlagSub
+	Conf         = new(conf.TypeConf).New()
+	Flag         conf.TypeFlag
+	FlagHistory  conf.TypeFlagHistory
+	FlagPlaylist conf.TypeFlagPlaylist
+	FlagSub      conf.TypeFlagSub
 )
