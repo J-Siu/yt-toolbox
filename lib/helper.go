@@ -28,34 +28,12 @@ import (
 	"github.com/J-Siu/go-dtquery/dq"
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/go-rod/rod"
+	"github.com/yosssi/gohtml"
 )
-
-func UrlDecode(urlIn string) (urlOut string) {
-	urlOut, err := url.QueryUnescape(urlIn)
-	if err != nil {
-		urlOut = urlIn
-	}
-	return
-}
-
-func UrlCleanup(urlIn string) (urlOut string, err error) {
-	// - domain to lowercase
-	// - uUnquote url
-	err = nil
-	urlOut = urlIn
-	if len(urlOut) != 0 {
-		var u *url.URL
-		u, err = url.Parse(urlIn)
-		if err == nil {
-			urlOut = u.String()
-		}
-	}
-	return urlOut, err
-}
 
 func GetTab(host string, port int) (page *rod.Page) {
 	prefix := "GetTab"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 	var (
 		browser *rod.Browser
 		err     error
@@ -80,6 +58,52 @@ func GetTab(host string, port int) (page *rod.Page) {
 	if err != nil {
 		ezlog.Err().N(prefix).M(err).Out()
 	}
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return
+}
+
+// log at trace level, format element html
+func TraceElement(prefix, tag string, e *rod.Element) {
+	ezlog.Trace()
+	if len(prefix) > 0 {
+		ezlog.N(prefix)
+	}
+	if len(tag) > 0 {
+		ezlog.N(tag)
+	}
+	ezlog.Lm(e)
+	if e != nil {
+		ezlog.Lm(gohtml.Format(e.MustHTML()))
+	}
+	ezlog.Out()
+}
+
+func UrlCleanup(urlIn string) (urlOut string, err error) {
+	// - domain to lowercase
+	// - uUnquote url
+	err = nil
+	urlOut = urlIn
+	if len(urlOut) != 0 {
+		var u *url.URL
+		u, err = url.Parse(urlIn)
+		if err == nil {
+			urlOut = u.String()
+		}
+	}
+	return urlOut, err
+}
+
+func UrlDecode(urlIn string) (urlOut string) {
+	urlOut, err := url.QueryUnescape(urlIn)
+	if err != nil {
+		urlOut = urlIn
+	}
+	return
+}
+
+func WaitPageStable(prefix string, page *rod.Page) {
+	prefix = prefix + ".WaitPageStable"
+	ezlog.Debug().N(prefix).TxtStart().Out()
+	page.MustWaitStable()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 }

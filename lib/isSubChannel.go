@@ -59,19 +59,19 @@ func (t *IsSubChannel) override() {
 
 func (t *IsSubChannel) override_V020_Elements(element *rod.Element) *rod.Elements {
 	prefix := t.MyType + ".V020_Elements"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	var elements rod.Elements
 	t.Page.MustElement("#content-section").MustWaitVisible()
 	elements = t.Page.MustElements("#content-section")
 
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return &elements
 }
 
 func (t *IsSubChannel) override_V030_ElementInfo() (infoP is.IInfo) {
 	prefix := t.MyType + ".V030_ElementInfo"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	if t.StateCurr.Element != nil {
 		var info YT_Info
@@ -84,6 +84,6 @@ func (t *IsSubChannel) override_V030_ElementInfo() (infoP is.IInfo) {
 		ezlog.Debug().N(prefix).M(info.String()).Out()
 		infoP = &info
 	}
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return infoP
 }

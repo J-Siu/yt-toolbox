@@ -23,9 +23,9 @@ THE SOFTWARE.
 package lib
 
 import (
+	"errors"
 	"math/rand/v2"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -33,6 +33,7 @@ import (
 	"github.com/J-Siu/go-helper/v2/str"
 	"github.com/J-Siu/go-is/v2/is"
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/input"
 	"github.com/go-rod/rod/lib/proto"
 	"github.com/yosssi/gohtml"
 )
@@ -86,28 +87,9 @@ func (t *IsHistoryEntry) override() {
 
 }
 
-func (t *IsHistoryEntry) V021_ElementsRemoveShorts(element *rod.Element) *IsHistoryEntry {
-	prefix := t.MyType + ".V020_ElementsRemoveShorts"
-	ezlog.Trace().N(prefix).TxtStart().Out()
-
-	var tagName = "ytd-reel-shelf-renderer"
-	var es rod.Elements
-	es, t.Err = element.Elements(tagName)
-	if t.Err != nil {
-		ezlog.Err().N(prefix).M(t.Err).Out()
-	}
-	es_count := len(es)
-	for i := range es {
-		es[es_count-i-1].Remove()
-	}
-
-	ezlog.Trace().N(prefix).TxtEnd().Out()
-	return t
-}
-
 func (t *IsHistoryEntry) override_V020_Elements(element *rod.Element) *rod.Elements {
 	prefix := t.MyType + ".V020_Elements"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	t.V021_ElementsRemoveShorts(element)
 	var (
@@ -119,13 +101,13 @@ func (t *IsHistoryEntry) override_V020_Elements(element *rod.Element) *rod.Eleme
 		ezlog.Err().N(prefix).M(t.Err).Out()
 	}
 	ezlog.Debug().N(prefix).N("elements count").M(len(elements)).Out()
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return &elements
 }
 
 func (t *IsHistoryEntry) override_V030_ElementInfo() (infoP is.IInfo) {
 	prefix := t.MyType + ".V030_ElementInfo"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	if t.StateCurr.Element != nil {
 		var (
@@ -216,13 +198,13 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() (infoP is.IInfo) {
 		ezlog.Debug().N(prefix).N("info").M(infoP.String()).Out()
 	}
 
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return infoP
 }
 
 func (t *IsHistoryEntry) override_V040_ElementMatch() (matched bool, matchedStr string) {
 	prefix := t.MyType + ".V040_ElementMatch"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	t.Deleted = false
 	info := t.StateCurr.ElementInfo.(*YT_Info)
@@ -230,81 +212,26 @@ func (t *IsHistoryEntry) override_V040_ElementMatch() (matched bool, matchedStr 
 
 	matched, matchedStr = str.ContainsAnySubStrings(&chkStr, &t.Filter, false)
 
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return matched, matchedStr
 }
 
 func (t *IsHistoryEntry) override_V050_ElementProcessMatched() {
 	prefix := t.MyType + ".V050_ElementProcessMatched"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 	var (
-		button         *rod.Element
-		err            error
-		menu           *rod.Element
-		menuItems      rod.Elements
-		menuItemsCount int
-		tag            string
-		txt            string
-		loop           bool
-		loopCount      int
+		state StateMachineState
 	)
-	if t.Del {
+	if t.Del && t.StateCurr.Element.MustVisible() {
 		// -- Old X-button -- START
 		// tag = "#top-level-buttons-computed" // X button
 		// button, err = t.StateCurr.Element.Element(tag)
 		// -- Old X-button -- END
 
-		ezlog.Trace().N(prefix).M("page stable - wait").Out()
-		t.Page.MustWaitStable()
-		ezlog.Trace().N(prefix).M("page stable").Out()
-		tag = "button"                                 // X button gone, 3-dot button
-		button, err = t.StateCurr.Element.Element(tag) // class, the 3-dot button
-		if err == nil {
-			button.MustVisible()
-			ezlog.Trace().N(prefix).M("3-dot clicked - before").Out()
-			button.MustClick() // click to bring up contextual menu
-			ezlog.Trace().N(prefix).M("3-dot clicked - done").Out()
-			tag = "tp-yt-paper-listbox,tp-yt-iron-dropdown"
-			menu, err = t.Page.Element(tag) // tag
-			if err == nil {
-				tag = "ytd-menu-service-item-renderer,yt-list-item-view-model"
-				loop = true
-				for loop {
-					loopCount++
-					menuItems, err = menu.Elements(tag) // tag
-					if err != nil {
-						loop = false
-					} else {
-						menuItemsCount = len(menuItems)
-						loop = menuItemsCount == 0
-						if loop && loopCount == 100 {
-							ezlog.Trace().N(prefix).N("loopCount").M(loopCount).N("menuItems").M(menuItemsCount).Out()
-							os.Exit(1)
-						}
-						if !loop {
-							ezlog.Trace().N(prefix).N("menuItems").M(menuItemsCount).Out()
-						}
-						for _, b := range menuItems {
-							txt = b.MustText()
-							// traceElement(prefix, txt, b)
-							ezlog.Trace().N(prefix).N("menuItems").M(txt).Out()
-							if strings.EqualFold(txt, "Remove from watch history") {
-								elementRandomClick(t.Page, b, 250, 500)
-								ezlog.Trace().N(prefix).N(txt).M("clicked").Out()
-								t.Deleted = true
-								ezlog.Debug().N(prefix).N("Deleted").M(t.Deleted).Out()
-								break
-							}
-						}
-					}
-				}
-			}
-		}
+		state.Next = t.V0511_WaitStable
+		t.V051_StateMachine(&state, 100, 300)
 	}
-	if err != nil {
-		ezlog.Err().N(prefix).M(err).Out()
-	}
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 }
 
 func (t *IsHistoryEntry) override_V060_ElementProcessUnmatch() {
@@ -314,17 +241,17 @@ func (t *IsHistoryEntry) override_V060_ElementProcessUnmatch() {
 
 func (t *IsHistoryEntry) override_V080_ElementScrollable() (scrollable bool) {
 	prefix := t.MyType + ".V080_ElementScrollable"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	info := t.StateCurr.ElementInfo.(*YT_Info)
 	scrollable = !t.Deleted && (len(info.Title) == 0 || !t.StateCurr.Element.MustVisible())
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return
 }
 
 func (t *IsHistoryEntry) override_V100_ScrollLoopEnd() {
 	prefix := t.MyType + ".V100_ScrollLoopEnd"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	if t.Remove {
 		if t.StateCurr.Elements != nil {
@@ -353,41 +280,214 @@ func (t *IsHistoryEntry) override_V100_ScrollLoopEnd() {
 			ezlog.Trace().N(prefix).N("t.StateCurr.Element").M(string(t.StateCurr.Element.Object.ObjectID)).Out()
 		}
 	}
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 }
 
-func traceElement(prefix, tag string, e *rod.Element) {
-	ezlog.Trace().N(prefix).N(tag).Lm(gohtml.Format(e.MustHTML())).Out()
+func (t *IsHistoryEntry) V021_ElementsRemoveShorts(element *rod.Element) *IsHistoryEntry {
+	prefix := t.MyType + ".V020_ElementsRemoveShorts"
+	ezlog.Debug().N(prefix).TxtStart().Out()
+
+	var tagName = "ytd-reel-shelf-renderer"
+	var es rod.Elements
+	es, t.Err = element.Elements(tagName)
+	if t.Err != nil {
+		ezlog.Err().N(prefix).M(t.Err).Out()
+	}
+	es_count := len(es)
+	for i := range es {
+		es[es_count-i-1].Remove()
+	}
+
+	ezlog.Debug().N(prefix).TxtEnd().Out()
+	return t
 }
 
-func elementRandomClick(page *rod.Page, e *rod.Element, min, max int64) {
-	prefix := "elementRandomClick"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+type StateMachineFunc func(state *StateMachineState)
+type StateMachineState struct {
+	Element *rod.Element
+	Err     error
+	Exit    bool
+	Name    string // State name
+	Next    StateMachineFunc
+}
+
+func (t *IsHistoryEntry) V051_StateMachine(state *StateMachineState, sleepMin, sleepMax float64) {
+	prefix := t.MyType + ".V0510"
+	ezlog.Debug().N(prefix).TxtStart().Out()
 	var (
-		interval int64
+		duration float64
 	)
-	traceElement(prefix, "", e)
-	ezlog.Trace().N(prefix).M("page stable - wait").Out()
-	page.MustWaitStable()
-	ezlog.Trace().N(prefix).M("page stable").Out()
-	interval = min + rand.Int64N(max-min)
-	time.Sleep(time.Duration(interval) * time.Millisecond / 2)
-	ezlog.Trace().N(prefix).N("sleep(ms) - before").M(interval).Out()
+	for !state.Exit {
+		// sleep
+		duration = sleepMin + rand.Float64()*(sleepMax-sleepMin)
+		ezlog.Info().N(prefix).N("sleep(ms)").M(int64(duration)).Out()
+		time.Sleep(time.Duration(duration) * time.Millisecond)
+		// next
+		state.Err = nil
+		state.Next(state)
+		ezlog.Info().N(state.Name).M("Done").Out()
+		if state.Err != nil {
+			ezlog.Err().N(state.Name).M(state.Err).Out()
+		}
+	}
+	ezlog.Debug().N(prefix).TxtStart().Out()
+}
+
+func (t *IsHistoryEntry) V0511_WaitStable(state *StateMachineState) {
+	prefix := t.MyType + ".V0511"
+	state.Name = prefix
+	ezlog.Debug().N(prefix).TxtStart().Out()
+	state.Err = t.Page.Keyboard.Press(input.Escape)
+	if state.Err == nil {
+		t.Page.Mouse.Scroll(0, 12, 3)
+		// WaitPageStable(prefix, t.Page)
+		state.Next = t.V0512_3DotClick
+	} else {
+		state.Next = t.V0511_WaitStable
+	}
+	ezlog.Debug().N(prefix).TxtEnd().Out()
+}
+
+// Click the 3-dot button to open popup menu
+func (t *IsHistoryEntry) V0512_3DotClick(state *StateMachineState) {
+	prefix := t.MyType + ".V0512"
+	state.Name = prefix
+	ezlog.Debug().N(prefix).TxtStart().Out()
+	var (
+		// tag = "button" // 3-dot button
+		tag = ".yt-lockup-metadata-view-model__menu-button" // 3-dot button
+	)
+
+	// select 3-dot
+	state.Element, state.Err = t.StateCurr.Element.Element(tag)
+	if state.Err != nil {
+		state.Exit = true
+	}
+	if state.Err == nil {
+		// make 3-dot within screen
+		state.Element.MustVisible()
+		// click 3-dot
+		state.Err = state.Element.Click(proto.InputMouseButtonLeft, 1)
+	}
+	if state.Err == nil {
+		state.Next = t.V0513_MenuSelect
+	} else {
+		state.Next = t.V0511_WaitStable
+	}
+	ezlog.Debug().N(prefix).TxtEnd().Out()
+}
+
+// Select the popup menu
+func (t *IsHistoryEntry) V0513_MenuSelect(state *StateMachineState) {
+	prefix := t.MyType + ".V0513"
+	state.Name = prefix
+	ezlog.Debug().N(prefix).TxtStart().Out()
+	var (
+		elements rod.Elements
+		// tag      = "tp-yt-paper-listbox,tp-yt-iron-dropdown"
+		tag = "#contentWrapper"
+	)
+	// select menu
+	state.Element = nil
+	elements, state.Err = t.Page.Elements(tag) // tag
+	if state.Err == nil {
+		for _, element := range elements {
+			if element.MustVisible() {
+				state.Element = element
+				state.Next = t.V0514_MenuRead
+				break
+			}
+		}
+		if state.Element == nil {
+			state.Err = errors.New("cannot select menu")
+		}
+	}
+	if state.Err != nil {
+		state.Next = t.V0511_WaitStable
+	}
+	ezlog.Debug().N(prefix).TxtEnd().Out()
+}
+
+// Read menu items
+func (t *IsHistoryEntry) V0514_MenuRead(state *StateMachineState) {
+	prefix := t.MyType + ".V0514"
+	state.Name = prefix
+	ezlog.Debug().N(prefix).TxtStart().Out()
+	// TraceElement(prefix, "", state.Element)
+	var (
+		matched         bool
+		menuItems       rod.Elements
+		menuItemText    string
+		menuItemTextReq = "Remove from watch history"
+		tag             = "ytd-menu-service-item-renderer,yt-list-item-view-model"
+	)
+	menuItems, state.Err = state.Element.Elements(tag) // tag
+	if state.Err == nil {
+		if len(menuItems) > 0 {
+			for _, item := range menuItems {
+				menuItemText = strings.TrimSpace(item.MustText())
+				ezlog.Trace().N(prefix).N("menuItems").M("'" + menuItemText + "'").Out()
+				if strings.EqualFold(menuItemText, menuItemTextReq) {
+					state.Element = item
+					state.Next = t.V0515_MenuClick
+					matched = true
+					break
+				}
+			}
+			if !matched {
+				TraceElement(prefix, "", state.Element)
+				state.Err = errors.New("unmatch: " + menuItemTextReq)
+			}
+		} else {
+			state.Err = errors.New("0 menu item")
+		}
+	}
+	if state.Err != nil {
+		state.Next = t.V0511_WaitStable
+	}
+	ezlog.Debug().N(prefix).TxtEnd().Out()
+}
+
+// Click the item, use state.Element from V0513
+func (t *IsHistoryEntry) V0515_MenuClick(state *StateMachineState) {
+	prefix := t.MyType + ".V0515"
+	state.Name = prefix
+	ezlog.Debug().N(prefix).TxtStart().Out()
+	TraceElement(prefix, "", state.Element)
+	var (
+		x, y  float64
+		box   *proto.DOMRect
+		shape *proto.DOMGetContentQuadsResult
+	)
 	{
-		var (
-			x, y float64
-		)
-		box := e.MustShape().Box()
-		ezlog.Trace().N(prefix).N("box").M(box).Out()
-		x = box.X + 1 + rand.Float64()*(box.Width-2)
-		y = box.Y + 1 + rand.Float64()*(box.Height-2)
-		page.Mouse.MustMoveTo(x, y).MustClick(proto.InputMouseButtonLeft)
+		// -- just click
+		// state.Err = state.Element.Click(proto.InputMouseButtonLeft, 1)
 	}
 	{
-		// e.MustClick()
+		// -- random position click
+		shape, state.Err = state.Element.Shape()
+		if state.Err == nil {
+			if shape == nil {
+				state.Err = errors.New("nil shape")
+			} else {
+				box = shape.Box()
+				ezlog.Trace().N(prefix).N("box").M(box).Out()
+				if box == nil {
+					state.Err = errors.New("nil box")
+				} else {
+					x = box.X + 1 + rand.Float64()*(box.Width-2)
+					y = box.Y + 1 + rand.Float64()*(box.Height-2)
+					t.Page.Mouse.MustMoveTo(x, y).MustClick(proto.InputMouseButtonLeft)
+					t.Deleted = true
+				}
+			}
+		}
 	}
-	interval = min + rand.Int64N(max-min)
-	time.Sleep(time.Duration(interval) * time.Millisecond / 2)
-	ezlog.Trace().N(prefix).N("sleep(ms) - after").M(interval).Out()
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	if state.Err == nil {
+		state.Exit = true
+	} else {
+		// TraceElement(prefix, state.Err.Error(), state.Element)
+		state.Next = t.V0511_WaitStable
+	}
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 }

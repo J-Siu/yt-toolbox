@@ -61,28 +61,28 @@ func (t *IsPlaylistVideo) override() {
 
 func (t *IsPlaylistVideo) override_V010_Container() *rod.Element {
 	prefix := t.MyType + ".V010_ElementsContainer"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 	tagName := "ytd-playlist-video-list-renderer"
 	element := t.Page.MustElement(tagName)
 	ezlog.Debug().N(prefix).N(tagName).Lm(element).Out()
 
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return element
 }
 
 func (t *IsPlaylistVideo) override_V020_Elements(element *rod.Element) *rod.Elements {
 	prefix := t.MyType + ".V020_Elements"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 	tagName := "ytd-playlist-video-renderer"
 	es := element.MustElements(tagName)
 	ezlog.Debug().N(prefix).N(tagName).N("count").M(len(es)).Out()
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return &es
 }
 
 func (t *IsPlaylistVideo) override_V030_ElementInfo() (infoP is.IInfo) {
 	prefix := t.MyType + ".V030_ElementInfo"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 	if t.StateCurr.Element != nil {
 		var info YT_Info
 		e := t.StateCurr.Element.MustElement("#video-title")
@@ -90,6 +90,6 @@ func (t *IsPlaylistVideo) override_V030_ElementInfo() (infoP is.IInfo) {
 		info.Url = *e.MustAttribute("href")
 		infoP = &info
 	}
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return infoP
 }

@@ -75,7 +75,7 @@ func (t *IsHistorySection) override() {
 
 func (t *IsHistorySection) override_V020_Elements(element *rod.Element) *rod.Elements {
 	prefix := t.MyType + ".V020_Elements"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	var tagName = "ytd-item-section-renderer"
 	e := t.Page.MustElement(tagName)
@@ -85,13 +85,13 @@ func (t *IsHistorySection) override_V020_Elements(element *rod.Element) *rod.Ele
 	elements := t.Page.MustElements(tagName)
 	ezlog.Trace().N(prefix).N(tagName).N("element count").M(len(elements)).Out()
 
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return &elements
 }
 
 func (t *IsHistorySection) override_V030_ElementInfo() (infoP is.IInfo) {
 	prefix := t.MyType + ".V030_ElementInfo"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	if t.StateCurr.Element != nil {
 		var (
@@ -116,13 +116,13 @@ func (t *IsHistorySection) override_V030_ElementInfo() (infoP is.IInfo) {
 		infoP = &info
 	}
 
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return infoP
 }
 
 func (t *IsHistorySection) override_V070_ElementProcess() {
 	prefix := t.MyType + ".V070_ElementProcess"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	titles := t.StateCurr.ElementInfo.(*YT_Info).Titles
 	if len(titles) != 0 && len((titles)[0]) != 0 {
@@ -146,12 +146,12 @@ func (t *IsHistorySection) override_V070_ElementProcess() {
 		isHistoryEntry.IInfoList.Print(mode)
 	}
 
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 }
 
 func (t *IsHistorySection) override_V100_ScrollLoopEnd() {
 	prefix := t.MyType + "V100_ScrollLoopEnd"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	if t.Remove {
 		t.removeSpinningWheel()
@@ -169,7 +169,7 @@ func (t *IsHistorySection) override_V100_ScrollLoopEnd() {
 	t.Page.MustWaitLoad()
 	ezlog.Trace().N(prefix).N("MustWaitLoad").TxtEnd().Out()
 
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 }
 
 func (t *IsHistorySection) removeSpinningWheel() {

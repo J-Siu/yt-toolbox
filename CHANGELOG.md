@@ -12,3 +12,7 @@
   - update go-is, go-dtquery, go-helper
 - v2.0.0
   - update go-is to v2
+- v2.0.1
+  - move url to global constant
+  - update go-is
+  - use state machine when deleting history item

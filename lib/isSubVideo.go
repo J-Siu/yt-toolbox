@@ -69,7 +69,7 @@ func (t *IsSubVideo) override() {
 
 func (t *IsSubVideo) override_V020_Elements(element *rod.Element) *rod.Elements {
 	prefix := t.MyType + ".V020_Elements"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	var elements rod.Elements
 	tagName := "ytd-rich-item-renderer"
@@ -77,14 +77,14 @@ func (t *IsSubVideo) override_V020_Elements(element *rod.Element) *rod.Elements 
 	elements = t.Page.MustElements(tagName)
 	ezlog.Debug().N(prefix).N("elements count").M(len(elements)).Out()
 
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return &elements
 }
 
 // [element] : "ytd-rich-item-renderer" element from V20_elements()
 func (t *IsSubVideo) override_V030_ElementInfo() (infoP is.IInfo) {
 	prefix := t.MyType + ".V030_ElementInfo"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	if t.StateCurr.Element != nil {
 		var (
@@ -133,7 +133,7 @@ func (t *IsSubVideo) override_V030_ElementInfo() (infoP is.IInfo) {
 		ezlog.Debug().N(prefix).Lm(info).Out()
 		infoP = &info
 	}
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return infoP
 }
 

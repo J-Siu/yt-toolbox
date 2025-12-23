@@ -74,30 +74,30 @@ func (t *IsPlaylist) override() {
 
 func (t *IsPlaylist) override_V010_Container() *rod.Element {
 	prefix := t.MyType + ".V010_ElementsContainer"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 	byId := "#contents"
 	e := t.Page.MustElement(byId) // by id
 	if ezlog.GetLogLevel() == ezlog.TRACE {
 		ezlog.Trace().N(prefix).M(byId).Lm(gohtml.Format(e.MustHTML())).Out()
 	}
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return e
 }
 
 func (t *IsPlaylist) override_V020_Elements(element *rod.Element) *rod.Elements {
 	prefix := t.MyType + ".V020_Elements"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 	tagName := "ytd-rich-item-renderer"
 	elements := element.MustElements(tagName)
 	ezlog.Debug().N(prefix).N(tagName).N("element count").M(len(elements)).Out()
 
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return &elements
 }
 
 func (t *IsPlaylist) override_V030_ElementInfo() (infoP is.IInfo) {
 	prefix := t.MyType + ".V030_ElementInfo"
-	ezlog.Trace().N(prefix).TxtStart().Out()
+	ezlog.Debug().N(prefix).TxtStart().Out()
 
 	if t.StateCurr.Element != nil {
 		var info YT_Info
@@ -122,7 +122,7 @@ func (t *IsPlaylist) override_V030_ElementInfo() (infoP is.IInfo) {
 		infoP = &info
 	}
 
-	ezlog.Trace().N(prefix).TxtEnd().Out()
+	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return infoP
 }
 
