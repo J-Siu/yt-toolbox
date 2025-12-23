@@ -87,7 +87,7 @@ func (t *IsPlaylistVideo) override_V030_ElementInfo() (infoP is.IInfo) {
 		var info YT_Info
 		e := t.StateCurr.Element.MustElement("#video-title")
 		info.Title = e.MustText()
-		info.Url = *e.MustAttribute("href")
+		info.Url = YT_FullUrl(*e.MustAttribute("href"))
 		infoP = &info
 	}
 	ezlog.Debug().N(prefix).TxtEnd().Out()

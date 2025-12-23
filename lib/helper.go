@@ -24,6 +24,7 @@ package lib
 
 import (
 	"net/url"
+	"strings"
 
 	"github.com/J-Siu/go-dtquery/dq"
 	"github.com/J-Siu/go-helper/v2/ezlog"
@@ -90,7 +91,7 @@ func UrlCleanup(urlIn string) (urlOut string, err error) {
 			urlOut = u.String()
 		}
 	}
-	return urlOut, err
+	return
 }
 
 func UrlDecode(urlIn string) (urlOut string) {
@@ -106,4 +107,18 @@ func WaitPageStable(prefix string, page *rod.Page) {
 	ezlog.Debug().N(prefix).TxtStart().Out()
 	page.MustWaitStable()
 	ezlog.Debug().N(prefix).TxtEnd().Out()
+}
+
+// Add YT base if missing, unescape query path
+func YT_FullUrl(urlIn string) (urlOut string) {
+	var (
+		err error
+	)
+	if !strings.HasPrefix(urlIn, YT_Base) {
+		urlOut, err = url.JoinPath(YT_Base, urlIn)
+		if err != nil {
+			urlOut = urlIn
+		}
+	}
+	return UrlDecode(urlOut)
 }

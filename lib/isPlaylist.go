@@ -116,7 +116,7 @@ func (t *IsPlaylist) override_V030_ElementInfo() (infoP is.IInfo) {
 				if ezlog.GetLogLevel() == ezlog.TRACE {
 					ezlog.Trace().N(prefix).N(tagName).Lm(gohtml.Format(s.MustHTML())).Out()
 				}
-				info.Url = *s.MustAttribute("href")
+				info.Url = YT_FullUrl(*s.MustAttribute("href"))
 			}
 		}
 		infoP = &info

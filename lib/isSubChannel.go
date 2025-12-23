@@ -75,12 +75,8 @@ func (t *IsSubChannel) override_V030_ElementInfo() (infoP is.IInfo) {
 
 	if t.StateCurr.Element != nil {
 		var info YT_Info
-		var title string
-		var urlPath *string
-		title = t.StateCurr.Element.MustElement("#text").MustText()
-		urlPath = t.StateCurr.Element.MustElement("#main-link").MustAttribute("href")
-		info.Title = title
-		info.Url =  *urlPath
+		info.Title = t.StateCurr.Element.MustElement("#text").MustText()
+		info.Url = YT_FullUrl(*t.StateCurr.Element.MustElement("#main-link").MustAttribute("href"))
 		ezlog.Debug().N(prefix).M(info.String()).Out()
 		infoP = &info
 	}

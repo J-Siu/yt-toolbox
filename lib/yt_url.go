@@ -20,14 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package global
+package lib
 
 const (
-	Search_Bing      = "https://www.bing.com"
-	Search_Google    = "https://www.google.com"
-	Search_Kagi      = "https://kagi.com"
-	Search_StartPage = "https://www.startpage.com"
-
 	YT_Base        = "https://www.youtube.com"
 	YT_History     = "https://www.youtube.com/feed/history"
 	YT_Playlists   = "https://www.youtube.com/feed/playlists"

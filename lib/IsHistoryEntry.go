@@ -131,7 +131,7 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() (infoP is.IInfo) {
 			}
 			info.Title = strings.TrimSpace(elementMeta.MustText())
 			if len(info.Title) != 0 {
-				info.Url = *elementMeta.MustAttribute("href")
+				info.Url = YT_FullUrl(*elementMeta.MustAttribute("href"))
 				info.Text = strings.TrimSpace(t.StateCurr.Element.MustElement("#description-text").MustText()) // by id
 
 				meta := t.StateCurr.Element.MustElement("#metadata") // by id
@@ -141,7 +141,7 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() (infoP is.IInfo) {
 				if a != nil {
 					chUrlP := a.MustAttribute("href")
 					if chUrlP != nil {
-						info.ChUrl = *chUrlP
+						info.ChUrl = YT_FullUrl(*chUrlP)
 						parsedUrl, err := url.Parse(info.ChUrl)
 						if err == nil {
 							info.ChUrlShort = parsedUrl.Path
@@ -161,7 +161,7 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() (infoP is.IInfo) {
 				// }
 				// -- title
 				info.Title = elementMeta.MustElement("a").MustText()
-				info.Url = *elementMeta.MustElement("a").MustAttribute("href")
+				info.Url = YT_FullUrl(*elementMeta.MustElement("a").MustAttribute("href"))
 				by = "[role='text']"
 				elementsText = elementMeta.MustElements(by)
 				elementsTextCount = len(elementsText)
@@ -172,7 +172,7 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() (infoP is.IInfo) {
 				for i, e := range elementsText {
 					ezlog.Info().N(prefix).N(by).N(i).M(e.MustText()).Out()
 				}
-				info.Title = elementsText[0].MustText()
+				// info.Title = elementsText[0].MustText()
 				info.ChName = elementsText[1].MustText()
 				switch elementsTextCount {
 				case 3:

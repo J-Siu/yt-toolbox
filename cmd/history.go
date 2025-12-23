@@ -39,7 +39,7 @@ var historyCmd = &cobra.Command{
 		isHistorySection := new(lib.IsHistorySection).
 			New(
 				page,
-				global.YT_History,
+				lib.YT_History,
 				!global.FlagHistory.NoRemove,
 				global.Flag.ScrollMax,
 				global.Flag.Verbose)

@@ -41,7 +41,7 @@ var playlistCmd = &cobra.Command{
 		isPlaylist := new(lib.IsPlaylist).
 			New(
 				page,
-				global.YT_Playlists,
+				lib.YT_Playlists,
 				global.Flag.ScrollMax,
 				&global.FlagPlaylist.Exclude,
 				&global.FlagPlaylist.Include).
