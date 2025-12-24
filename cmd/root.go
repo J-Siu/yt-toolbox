@@ -80,6 +80,7 @@ func init() {
 	cmd.PersistentFlags().BoolVarP(&global.Flag.Verbose, "verbose", "v", false, "Verbose")
 	cmd.PersistentFlags().StringVarP(&global.Conf.FileConf, "config", "c", conf.Default.FileConf, "Config file")
 
+	cmd.PersistentFlags().BoolVarP(&global.Flag.Desc, "desc", "", false, "Show description")
 	cmd.PersistentFlags().IntVarP(&global.Flag.ScrollMax, "scroll-max", "s", 0, "Unlimited -1 (default: 0)")
 
 	cmd.PersistentFlags().Uint("port", 0, "Devtools Port")

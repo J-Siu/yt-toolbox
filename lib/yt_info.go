@@ -22,7 +22,10 @@ THE SOFTWARE.
 
 package lib
 
-import is "github.com/J-Siu/go-is/v2/is"
+import (
+	is "github.com/J-Siu/go-is/v2/is"
+	"github.com/J-Siu/yt-toolbox/v2/global"
+)
 
 // Embed [is.InfoBase] for [is.IInfo] interface
 type YT_Info struct {
@@ -41,5 +44,9 @@ type YT_Info struct {
 }
 
 func (t *YT_Info) String() string {
-	return "[" + t.Title + "](" + UrlDecode(t.Url) + ") | [" + t.ChName + "](" + t.ChUrl + ") | " + t.Text
+	if global.Flag.Desc {
+		return "[" + t.Title + "](" + UrlDecode(t.Url) + ") | [" + t.ChName + "](" + t.ChUrl + ") | " + t.Text
+	} else {
+		return "[" + t.Title + "](" + UrlDecode(t.Url) + ") | [" + t.ChName + "](" + t.ChUrl + ")"
+	}
 }

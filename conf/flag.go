@@ -28,6 +28,7 @@ type TypeFlag struct {
 	Trace   bool // Enable trace output
 	Verbose bool
 
+	Desc      bool
 	ScrollMax int
 }
 
@@ -40,7 +41,6 @@ type TypeFlagPlaylist struct {
 type TypeFlagHistory struct {
 	ClickSleep float32
 	Del        bool
-	Desc       bool
 	Filter     []string
 	NoRemove   bool
 }

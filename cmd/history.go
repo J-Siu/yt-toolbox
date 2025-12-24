@@ -55,6 +55,5 @@ func init() {
 	rootCmd.AddCommand(cmd)
 
 	cmd.PersistentFlags().BoolVarP(&global.FlagHistory.Del, "del", "", false, "Perform actual deletion. [default: Dry run]")
-	cmd.PersistentFlags().BoolVarP(&global.FlagHistory.Desc, "desc", "", false, "Show description")
 	cmd.PersistentFlags().BoolVarP(&global.FlagHistory.NoRemove, "no-remove", "n", false, "No removal of screen element. (Not history deletion!) [default: Remove screen element.]")
 }
