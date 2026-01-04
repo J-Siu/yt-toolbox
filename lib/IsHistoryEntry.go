@@ -29,7 +29,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/J-Siu/go-helper/v2/errs"
 	"github.com/J-Siu/go-helper/v2/ezlog"
+	"github.com/J-Siu/go-helper/v2/state"
 	"github.com/J-Siu/go-helper/v2/str"
 	"github.com/J-Siu/go-is/v2/is"
 	"github.com/go-rod/rod"
@@ -40,7 +42,7 @@ import (
 
 // process YT history by entry
 type IsHistoryEntry struct {
-	*is.Processor
+	is.Processor
 
 	ClickSleep  float64 // in second
 	Del         bool    // delete entry from history
@@ -51,16 +53,27 @@ type IsHistoryEntry struct {
 	Standalone  bool    // false;
 	Verbose     bool    // false;
 	Filter      []string
+
+	state state.State[V050_StateData]
 }
 
 func (t *IsHistoryEntry) New(property *is.Property, del bool, remove bool, filter *[]string) *IsHistoryEntry {
-	t.Processor = is.New(property) // Init the base struct
+	t.Processor.New(property) // Init the base struct
 	t.MyType = "IsHistoryEntry"
 
 	t.Filter = append(t.Filter, *filter...)
 	t.Del = del
 	t.Remove = remove
 	t.override()
+
+	t.state = state.State[V050_StateData]{
+		Data: V050_StateData{
+			SleepMax: 300,
+			SleepMin: 100,
+		},
+		Pre:   t.V051_FuncPre,
+		OnErr: V051_OnErrFunc,
+	}
 
 	return t
 }
@@ -219,17 +232,12 @@ func (t *IsHistoryEntry) override_V040_ElementMatch() (matched bool, matchedStr 
 func (t *IsHistoryEntry) override_V050_ElementProcessMatched() {
 	prefix := t.MyType + ".V050_ElementProcessMatched"
 	ezlog.Debug().N(prefix).TxtStart().Out()
-	var (
-		state StateMachineState
-	)
 	if t.Del && t.StateCurr.Element.MustVisible() {
 		// -- Old X-button -- START
 		// tag = "#top-level-buttons-computed" // X button
 		// button, err = t.StateCurr.Element.Element(tag)
 		// -- Old X-button -- END
-
-		state.Next = t.V0511_WaitStable
-		t.V051_StateMachine(&state, 100, 300)
+		t.state.Run(t.V0511_WaitStable, true)
 	}
 	ezlog.Debug().N(prefix).TxtEnd().Out()
 }
@@ -302,38 +310,32 @@ func (t *IsHistoryEntry) V021_ElementsRemoveShorts(element *rod.Element) *IsHist
 	return t
 }
 
-type StateMachineFunc func(state *StateMachineState)
-type StateMachineState struct {
-	Element *rod.Element
-	Err     error
-	Exit    bool
-	Name    string // State name
-	Next    StateMachineFunc
+type V050_StateData struct {
+	Element  *rod.Element
+	SleepMax float64
+	SleepMin float64
 }
 
-func (t *IsHistoryEntry) V051_StateMachine(state *StateMachineState, sleepMin, sleepMax float64) {
-	prefix := t.MyType + ".V0510"
-	ezlog.Debug().N(prefix).TxtStart().Out()
+func (t *IsHistoryEntry) V051_FuncPre(state *state.State[V050_StateData]) *state.State[V050_StateData] {
+	prefix := t.MyType + ".V051_FuncPre"
 	var (
 		duration float64
 	)
-	for !state.Exit {
-		// sleep
-		duration = sleepMin + rand.Float64()*(sleepMax-sleepMin)
-		ezlog.Info().N(prefix).N("sleep(ms)").M(int64(duration)).Out()
-		time.Sleep(time.Duration(duration) * time.Millisecond)
-		// next
-		state.Err = nil
-		state.Next(state)
-		ezlog.Info().N(state.Name).M("Done").Out()
-		if state.Err != nil {
-			ezlog.Err().N(state.Name).M(state.Err).Out()
-		}
-	}
+	state.Name = prefix
 	ezlog.Debug().N(prefix).TxtStart().Out()
+	duration = state.Data.SleepMin + rand.Float64()*(state.Data.SleepMax-state.Data.SleepMin)
+	ezlog.Info().N(prefix).N("sleep(ms)").M(int64(duration)).Out()
+	time.Sleep(time.Duration(duration) * time.Millisecond)
+	ezlog.Debug().N(prefix).TxtEnd().Out()
+	return state
 }
 
-func (t *IsHistoryEntry) V0511_WaitStable(state *StateMachineState) {
+func V051_OnErrFunc(state *state.State[V050_StateData]) *state.State[V050_StateData] {
+	errs.Queue(state.Name, state.Err)
+	return state
+}
+
+func (t *IsHistoryEntry) V0511_WaitStable(state *state.State[V050_StateData]) *state.State[V050_StateData] {
 	prefix := t.MyType + ".V0511"
 	state.Name = prefix
 	ezlog.Debug().N(prefix).TxtStart().Out()
@@ -346,28 +348,36 @@ func (t *IsHistoryEntry) V0511_WaitStable(state *StateMachineState) {
 		state.Next = t.V0511_WaitStable
 	}
 	ezlog.Debug().N(prefix).TxtEnd().Out()
+	return state
 }
 
 // Click the 3-dot button to open popup menu
-func (t *IsHistoryEntry) V0512_3DotClick(state *StateMachineState) {
+func (t *IsHistoryEntry) V0512_3DotClick(state *state.State[V050_StateData]) *state.State[V050_StateData] {
 	prefix := t.MyType + ".V0512"
 	state.Name = prefix
 	ezlog.Debug().N(prefix).TxtStart().Out()
 	var (
-		// tag = "button" // 3-dot button
-		tag = ".yt-lockup-metadata-view-model__menu-button" // 3-dot button
+		tags = []string{
+			"button",
+			".yt-lockup-metadata-view-model__menu-button"}
 	)
-
 	// select 3-dot
-	state.Element, state.Err = t.StateCurr.Element.Element(tag)
-	if state.Err != nil {
-		state.Exit = true
+	for _, tag := range tags {
+		state.Data.Element, state.Err = t.StateCurr.Element.Element(tag)
+		if state.Err == nil {
+			break
+		}
 	}
+	if state.Err != nil {
+		state.Next = nil
+	}
+	ezlog.Debug().N(prefix).N("state.Err").M(state.Err).Out()
 	if state.Err == nil {
 		// make 3-dot within screen
-		state.Element.MustVisible()
+		// state.Data.Element.MustVisible()
 		// click 3-dot
-		state.Err = state.Element.Click(proto.InputMouseButtonLeft, 1)
+		state.Err = state.Data.Element.Click(proto.InputMouseButtonLeft, 1)
+		ezlog.Debug().N(prefix).M("clicked").Out()
 	}
 	if state.Err == nil {
 		state.Next = t.V0513_MenuSelect
@@ -375,10 +385,11 @@ func (t *IsHistoryEntry) V0512_3DotClick(state *StateMachineState) {
 		state.Next = t.V0511_WaitStable
 	}
 	ezlog.Debug().N(prefix).TxtEnd().Out()
+	return state
 }
 
 // Select the popup menu
-func (t *IsHistoryEntry) V0513_MenuSelect(state *StateMachineState) {
+func (t *IsHistoryEntry) V0513_MenuSelect(state *state.State[V050_StateData]) *state.State[V050_StateData] {
 	prefix := t.MyType + ".V0513"
 	state.Name = prefix
 	ezlog.Debug().N(prefix).TxtStart().Out()
@@ -388,17 +399,17 @@ func (t *IsHistoryEntry) V0513_MenuSelect(state *StateMachineState) {
 		tag = "#contentWrapper"
 	)
 	// select menu
-	state.Element = nil
+	state.Data.Element = nil
 	elements, state.Err = t.Page.Elements(tag) // tag
 	if state.Err == nil {
 		for _, element := range elements {
 			if element.MustVisible() {
-				state.Element = element
+				state.Data.Element = element
 				state.Next = t.V0514_MenuRead
 				break
 			}
 		}
-		if state.Element == nil {
+		if state.Data.Element == nil {
 			state.Err = errors.New("cannot select menu")
 		}
 	}
@@ -406,10 +417,11 @@ func (t *IsHistoryEntry) V0513_MenuSelect(state *StateMachineState) {
 		state.Next = t.V0511_WaitStable
 	}
 	ezlog.Debug().N(prefix).TxtEnd().Out()
+	return state
 }
 
 // Read menu items
-func (t *IsHistoryEntry) V0514_MenuRead(state *StateMachineState) {
+func (t *IsHistoryEntry) V0514_MenuRead(state *state.State[V050_StateData]) *state.State[V050_StateData] {
 	prefix := t.MyType + ".V0514"
 	state.Name = prefix
 	ezlog.Debug().N(prefix).TxtStart().Out()
@@ -421,21 +433,21 @@ func (t *IsHistoryEntry) V0514_MenuRead(state *StateMachineState) {
 		menuItemTextReq = "Remove from watch history"
 		tag             = "ytd-menu-service-item-renderer,yt-list-item-view-model"
 	)
-	menuItems, state.Err = state.Element.Elements(tag) // tag
+	menuItems, state.Err = state.Data.Element.Elements(tag) // tag
 	if state.Err == nil {
 		if len(menuItems) > 0 {
 			for _, item := range menuItems {
 				menuItemText = strings.TrimSpace(item.MustText())
 				ezlog.Trace().N(prefix).N("menuItems").M("'" + menuItemText + "'").Out()
 				if strings.EqualFold(menuItemText, menuItemTextReq) {
-					state.Element = item
+					state.Data.Element = item
 					state.Next = t.V0515_MenuClick
 					matched = true
 					break
 				}
 			}
 			if !matched {
-				TraceElement(prefix, "", state.Element)
+				TraceElement(prefix, "", state.Data.Element)
 				state.Err = errors.New("unmatch: " + menuItemTextReq)
 			}
 		} else {
@@ -446,14 +458,15 @@ func (t *IsHistoryEntry) V0514_MenuRead(state *StateMachineState) {
 		state.Next = t.V0511_WaitStable
 	}
 	ezlog.Debug().N(prefix).TxtEnd().Out()
+	return state
 }
 
 // Click the item, use state.Element from V0513
-func (t *IsHistoryEntry) V0515_MenuClick(state *StateMachineState) {
+func (t *IsHistoryEntry) V0515_MenuClick(state *state.State[V050_StateData]) *state.State[V050_StateData] {
 	prefix := t.MyType + ".V0515"
 	state.Name = prefix
 	ezlog.Debug().N(prefix).TxtStart().Out()
-	TraceElement(prefix, "", state.Element)
+	TraceElement(prefix, "", state.Data.Element)
 	var (
 		x, y  float64
 		box   *proto.DOMRect
@@ -461,11 +474,11 @@ func (t *IsHistoryEntry) V0515_MenuClick(state *StateMachineState) {
 	)
 	{
 		// -- just click
-		// state.Err = state.Element.Click(proto.InputMouseButtonLeft, 1)
+		// state.Err = state.Data.Element.Click(proto.InputMouseButtonLeft, 1)
 	}
 	{
 		// -- random position click
-		shape, state.Err = state.Element.Shape()
+		shape, state.Err = state.Data.Element.Shape()
 		if state.Err == nil {
 			if shape == nil {
 				state.Err = errors.New("nil shape")
@@ -484,10 +497,11 @@ func (t *IsHistoryEntry) V0515_MenuClick(state *StateMachineState) {
 		}
 	}
 	if state.Err == nil {
-		state.Exit = true
+		state.Next = nil
 	} else {
 		// TraceElement(prefix, state.Err.Error(), state.Element)
 		state.Next = t.V0511_WaitStable
 	}
 	ezlog.Debug().N(prefix).TxtEnd().Out()
+	return state
 }

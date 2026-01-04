@@ -25,7 +25,7 @@ package global
 import "github.com/J-Siu/yt-toolbox/v2/conf"
 
 var (
-	Conf         = new(conf.TypeConf).New()
+	Conf         conf.TypeConf
 	Flag         conf.TypeFlag
 	FlagHistory  conf.TypeFlagHistory
 	FlagPlaylist conf.TypeFlagPlaylist

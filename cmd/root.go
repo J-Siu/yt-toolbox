@@ -50,6 +50,7 @@ var rootCmd = &cobra.Command{
 			Ln("Flag").Lm(&global.Flag).
 			Out()
 		// -- Flags override default and config
+		global.Conf.New()
 		if len(host) > 0 {
 			global.Conf.DevtoolsHost = host
 		}
@@ -75,7 +76,7 @@ func Execute() {
 
 func init() {
 	cmd := rootCmd
-	cmd.PersistentFlags().BoolVarP(&global.Flag.Debug, "debug", "", false, "Enable debug")
+	cmd.PersistentFlags().BoolVarP(&global.Flag.Debug, "debug", "d", false, "Enable debug")
 	cmd.PersistentFlags().BoolVarP(&global.Flag.Trace, "trace", "t", false, "Enable trace (include debug)")
 	cmd.PersistentFlags().BoolVarP(&global.Flag.Verbose, "verbose", "v", false, "Verbose")
 	cmd.PersistentFlags().StringVarP(&global.Conf.FileConf, "config", "c", conf.Default.FileConf, "Config file")

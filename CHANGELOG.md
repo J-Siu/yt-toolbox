@@ -16,3 +16,5 @@
   - move url to global constant
   - update go-is
   - use state machine when deleting history item
+- v2.0.2
+  - use go-helper state machine

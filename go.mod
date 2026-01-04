@@ -1,10 +1,10 @@
 module github.com/J-Siu/yt-toolbox/v2
 
-go 1.25.1
+go 1.25.5
 
 require (
 	github.com/J-Siu/go-dtquery v1.2.2
-	github.com/J-Siu/go-helper/v2 v2.6.6
+	github.com/J-Siu/go-helper/v2 v2.7.0
 	github.com/J-Siu/go-is/v2 v2.0.1
 	github.com/go-rod/rod v0.116.2
 	github.com/spf13/cobra v1.10.2
