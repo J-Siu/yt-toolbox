@@ -23,7 +23,7 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/J-Siu/go-is/v2/is"
+	"github.com/J-Siu/go-is/v3/is"
 	"github.com/J-Siu/yt-toolbox/v2/global"
 	"github.com/J-Siu/yt-toolbox/v2/lib"
 	"github.com/spf13/cobra"
@@ -55,5 +55,5 @@ func init() {
 	cmd := subVideoCmd
 	subscriptionsCmd.AddCommand(cmd)
 
-	cmd.Flags().UintVarP(&global.FlagSub.Day, "day", "d", 0, "number of days (override scroll)")
+	cmd.Flags().UintVarP(&global.FlagSub.Day, "day", "", 0, "number of days (override scroll)")
 }

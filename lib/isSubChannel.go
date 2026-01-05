@@ -24,7 +24,7 @@ package lib
 
 import (
 	"github.com/J-Siu/go-helper/v2/ezlog"
-	"github.com/J-Siu/go-is/v2/is"
+	"github.com/J-Siu/go-is/v3/is"
 	"github.com/go-rod/rod"
 )
 
@@ -57,29 +57,21 @@ func (t *IsSubChannel) override() {
 	t.V030_ElementInfo = t.override_V030_ElementInfo
 }
 
-func (t *IsSubChannel) override_V020_Elements(element *rod.Element) *rod.Elements {
+func (t *IsSubChannel) override_V020_Elements() {
 	prefix := t.MyType + ".V020_Elements"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
-	var elements rod.Elements
+	t.StateCurr.Name = prefix
 	t.Page.MustElement("#content-section").MustWaitVisible()
-	elements = t.Page.MustElements("#content-section")
-
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return &elements
+	t.StateCurr.Elements = t.Page.MustElements("#content-section")
 }
 
-func (t *IsSubChannel) override_V030_ElementInfo() (infoP is.IInfo) {
+func (t *IsSubChannel) override_V030_ElementInfo() {
 	prefix := t.MyType + ".V030_ElementInfo"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
+	t.StateCurr.Name = prefix
 	if t.StateCurr.Element != nil {
 		var info YT_Info
 		info.Title = t.StateCurr.Element.MustElement("#text").MustText()
 		info.Url = YT_FullUrl(*t.StateCurr.Element.MustElement("#main-link").MustAttribute("href"))
 		ezlog.Debug().N(prefix).M(info.String()).Out()
-		infoP = &info
+		t.StateCurr.ElementInfo = &info
 	}
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return infoP
 }

@@ -25,7 +25,7 @@ package lib
 import (
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-helper/v2/strany"
-	"github.com/J-Siu/go-is/v2/is"
+	"github.com/J-Siu/go-is/v3/is"
 	"github.com/go-rod/rod"
 )
 
@@ -73,26 +73,21 @@ func (t *IsHistorySection) override() {
 	t.V100_ScrollLoopEnd = t.override_V100_ScrollLoopEnd
 }
 
-func (t *IsHistorySection) override_V020_Elements(element *rod.Element) *rod.Elements {
+func (t *IsHistorySection) override_V020_Elements() {
 	prefix := t.MyType + ".V020_Elements"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
-	var tagName = "ytd-item-section-renderer"
-	e := t.Page.MustElement(tagName)
+	t.StateCurr.Name = prefix
+	tagName := "ytd-item-section-renderer"
+	section := t.Page.MustElement(tagName) // necessary?
 	ezlog.Trace().N(prefix).N("MustWaitDOMStable").TxtStart().Out()
-	e.MustWaitVisible()
+	section.MustWaitVisible()
 	ezlog.Trace().N(prefix).N("MustWaitDOMStable").TxtEnd().Out()
-	elements := t.Page.MustElements(tagName)
-	ezlog.Trace().N(prefix).N(tagName).N("element count").M(len(elements)).Out()
-
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return &elements
+	t.StateCurr.Elements = t.Page.MustElements(tagName)
+	ezlog.Trace().N(prefix).N(tagName).N("element count").M(len(t.StateCurr.Elements)).Out()
 }
 
-func (t *IsHistorySection) override_V030_ElementInfo() (infoP is.IInfo) {
+func (t *IsHistorySection) override_V030_ElementInfo() {
 	prefix := t.MyType + ".V030_ElementInfo"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
+	t.StateCurr.Name = prefix
 	if t.StateCurr.Element != nil {
 		var (
 			info     YT_Info
@@ -113,17 +108,13 @@ func (t *IsHistorySection) override_V030_ElementInfo() (infoP is.IInfo) {
 		if len(info.Titles) == 0 {
 			info.Titles = []string{""}
 		}
-		infoP = &info
+		t.StateCurr.ElementInfo = &info
 	}
-
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return infoP
 }
 
 func (t *IsHistorySection) override_V070_ElementProcess() {
 	prefix := t.MyType + ".V070_ElementProcess"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
+	t.StateCurr.Name = prefix
 	titles := t.StateCurr.ElementInfo.(*YT_Info).Titles
 	if len(titles) != 0 && len((titles)[0]) != 0 {
 		var (
@@ -145,18 +136,15 @@ func (t *IsHistorySection) override_V070_ElementProcess() {
 		ezlog.Log().M("--|--|--|--|--").Out()
 		isHistoryEntry.IInfoList.Print(mode)
 	}
-
-	ezlog.Debug().N(prefix).TxtEnd().Out()
 }
 
 func (t *IsHistorySection) override_V100_ScrollLoopEnd() {
 	prefix := t.MyType + "V100_ScrollLoopEnd"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
+	t.StateCurr.Name = prefix
 	if t.Remove {
 		t.removeSpinningWheel()
 		if t.StateCurr.Elements != nil {
-			for _, e := range *t.StateCurr.Elements {
+			for _, e := range t.StateCurr.Elements {
 				e.Remove()
 			}
 		}
@@ -168,8 +156,6 @@ func (t *IsHistorySection) override_V100_ScrollLoopEnd() {
 	ezlog.Trace().N(prefix).N("MustWaitLoad").TxtStart().Out()
 	t.Page.MustWaitLoad()
 	ezlog.Trace().N(prefix).N("MustWaitLoad").TxtEnd().Out()
-
-	ezlog.Debug().N(prefix).TxtEnd().Out()
 }
 
 func (t *IsHistorySection) removeSpinningWheel() {

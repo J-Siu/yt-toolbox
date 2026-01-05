@@ -79,34 +79,12 @@ func TraceElement(prefix, tag string, e *rod.Element) {
 	ezlog.Out()
 }
 
-func UrlCleanup(urlIn string) (urlOut string, err error) {
-	// - domain to lowercase
-	// - uUnquote url
-	err = nil
-	urlOut = urlIn
-	if len(urlOut) != 0 {
-		var u *url.URL
-		u, err = url.Parse(urlIn)
-		if err == nil {
-			urlOut = u.String()
-		}
-	}
-	return
-}
-
 func UrlDecode(urlIn string) (urlOut string) {
 	urlOut, err := url.QueryUnescape(urlIn)
 	if err != nil {
 		urlOut = urlIn
 	}
 	return
-}
-
-func WaitPageStable(prefix string, page *rod.Page) {
-	prefix = prefix + ".WaitPageStable"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-	page.MustWaitStable()
-	ezlog.Debug().N(prefix).TxtEnd().Out()
 }
 
 // Add YT base if missing, unescape query path

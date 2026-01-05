@@ -33,7 +33,7 @@ import (
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-helper/v2/state"
 	"github.com/J-Siu/go-helper/v2/str"
-	"github.com/J-Siu/go-is/v2/is"
+	"github.com/J-Siu/go-is/v3/is"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/input"
 	"github.com/go-rod/rod/lib/proto"
@@ -71,9 +71,11 @@ func (t *IsHistoryEntry) New(property *is.Property, del bool, remove bool, filte
 			SleepMax: 300,
 			SleepMin: 100,
 		},
-		Pre:   t.V051_FuncPre,
-		OnErr: V051_OnErrFunc,
+		OnErr:         t.V051_OnErrFunc,
+		OnErrContinue: true,
+		Pre:           t.V051_FuncPre,
 	}
+	t.state.MyType = t.MyType + ".state"
 
 	return t
 }
@@ -85,43 +87,32 @@ func (t *IsHistoryEntry) Run() *IsHistoryEntry {
 
 func (t *IsHistoryEntry) override() {
 	t.V020_Elements = t.override_V020_Elements
-
 	t.V030_ElementInfo = t.override_V030_ElementInfo
-
 	t.V040_ElementMatch = t.override_V040_ElementMatch
-
 	t.V050_ElementProcessMatched = t.override_V050_ElementProcessMatched
-
 	t.V060_ElementProcessUnmatch = t.override_V060_ElementProcessUnmatch
-
 	t.V080_ElementScrollable = t.override_V080_ElementScrollable
-
 	t.V100_ScrollLoopEnd = t.override_V100_ScrollLoopEnd
-
 }
 
-func (t *IsHistoryEntry) override_V020_Elements(element *rod.Element) *rod.Elements {
+func (t *IsHistoryEntry) override_V020_Elements() {
 	prefix := t.MyType + ".V020_Elements"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
-	t.V021_ElementsRemoveShorts(element)
+	t.StateCurr.Name = prefix
 	var (
 		tagNames = []string{"ytd-video-renderer", "yt-lockup-view-model"}
-		elements rod.Elements
 	)
-	elements, t.Err = element.Elements(strings.Join(tagNames, ",")) // multiple tag names separate by comma
+	ezlog.Debug().N(prefix).N("Container").M(t.Container).Out()
+	t.V021_ElementsRemoveShorts(t.Container)
+	t.StateCurr.Elements, t.Err = t.Container.Elements(strings.Join(tagNames, ",")) // multiple tag names separate by comma
 	if t.Err != nil {
 		ezlog.Err().N(prefix).M(t.Err).Out()
 	}
-	ezlog.Debug().N(prefix).N("elements count").M(len(elements)).Out()
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return &elements
+	ezlog.Debug().N(prefix).N("elements count").M(len(t.StateCurr.Elements)).Out()
 }
 
-func (t *IsHistoryEntry) override_V030_ElementInfo() (infoP is.IInfo) {
+func (t *IsHistoryEntry) override_V030_ElementInfo() {
 	prefix := t.MyType + ".V030_ElementInfo"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
+	t.StateCurr.Name = prefix
 	if t.StateCurr.Element != nil {
 		var (
 			by                string
@@ -206,64 +197,52 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() (infoP is.IInfo) {
 					Out()
 			}
 		}
-
-		infoP = &info
-		ezlog.Debug().N(prefix).N("info").M(infoP.String()).Out()
+		t.StateCurr.ElementInfo = &info
+		ezlog.Debug().N(prefix).N("info").M(info.String()).Out()
 	}
-
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return infoP
 }
 
-func (t *IsHistoryEntry) override_V040_ElementMatch() (matched bool, matchedStr string) {
+func (t *IsHistoryEntry) override_V040_ElementMatch() {
 	prefix := t.MyType + ".V040_ElementMatch"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
+	var (
+		matched    bool
+		matchedStr string
+	)
+	t.StateCurr.Name = prefix
 	t.Deleted = false
 	info := t.StateCurr.ElementInfo.(*YT_Info)
 	chkStr := info.Title + " " + info.Text + " " + info.ChName + " " + info.ChUrlShort
-
 	matched, matchedStr = str.ContainsAnySubStrings(&chkStr, &t.Filter, false)
-
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return matched, matchedStr
+	t.StateCurr.ElementInfo.SetMatched(matched)
+	t.StateCurr.ElementInfo.SetMatchedStr(matchedStr)
 }
 
 func (t *IsHistoryEntry) override_V050_ElementProcessMatched() {
 	prefix := t.MyType + ".V050_ElementProcessMatched"
-	ezlog.Debug().N(prefix).TxtStart().Out()
+	t.StateCurr.Name = prefix
 	if t.Del && t.StateCurr.Element.MustVisible() {
-		// -- Old X-button -- START
-		// tag = "#top-level-buttons-computed" // X button
-		// button, err = t.StateCurr.Element.Element(tag)
-		// -- Old X-button -- END
-		t.state.Run(t.V0511_WaitStable, true)
+		t.state.Run(t.V0511_WaitStable)
 	}
-	ezlog.Debug().N(prefix).TxtEnd().Out()
 }
 
 func (t *IsHistoryEntry) override_V060_ElementProcessUnmatch() {
 	prefix := t.MyType + ".V060_ElementProcessUnmatch"
-	ezlog.Trace().N(prefix).M("Done").Out()
+	t.StateCurr.Name = prefix
 }
 
-func (t *IsHistoryEntry) override_V080_ElementScrollable() (scrollable bool) {
+func (t *IsHistoryEntry) override_V080_ElementScrollable() {
 	prefix := t.MyType + ".V080_ElementScrollable"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
+	t.StateCurr.Name = prefix
 	info := t.StateCurr.ElementInfo.(*YT_Info)
-	scrollable = !t.Deleted && (len(info.Title) == 0 || !t.StateCurr.Element.MustVisible())
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return
+	t.StateCurr.Scrollable = !t.Deleted && (len(info.Title) == 0 || !t.StateCurr.Element.MustVisible())
 }
 
 func (t *IsHistoryEntry) override_V100_ScrollLoopEnd() {
 	prefix := t.MyType + ".V100_ScrollLoopEnd"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
+	t.StateCurr.Name = prefix
 	if t.Remove {
 		if t.StateCurr.Elements != nil {
-			for _, e := range *t.StateCurr.Elements {
+			for _, e := range t.StateCurr.Elements {
 				e.Remove()
 			}
 			t.StateCurr.ElementsCount = 0
@@ -288,74 +267,70 @@ func (t *IsHistoryEntry) override_V100_ScrollLoopEnd() {
 			ezlog.Trace().N(prefix).N("t.StateCurr.Element").M(string(t.StateCurr.Element.Object.ObjectID)).Out()
 		}
 	}
-	ezlog.Debug().N(prefix).TxtEnd().Out()
 }
 
 func (t *IsHistoryEntry) V021_ElementsRemoveShorts(element *rod.Element) *IsHistoryEntry {
 	prefix := t.MyType + ".V020_ElementsRemoveShorts"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
-	var tagName = "ytd-reel-shelf-renderer"
-	var es rod.Elements
-	es, t.Err = element.Elements(tagName)
-	if t.Err != nil {
-		ezlog.Err().N(prefix).M(t.Err).Out()
+	t.StateCurr.Name = prefix
+	if element != nil {
+		var (
+			tagName = "ytd-reel-shelf-renderer"
+			es      rod.Elements
+		)
+		es, t.Err = element.Elements(tagName)
+		if t.Err != nil {
+			ezlog.Err().N(prefix).M(t.Err).Out()
+		}
+		es_count := len(es)
+		for i := range es {
+			es[es_count-i-1].Remove()
+		}
 	}
-	es_count := len(es)
-	for i := range es {
-		es[es_count-i-1].Remove()
-	}
-
-	ezlog.Debug().N(prefix).TxtEnd().Out()
 	return t
 }
 
 type V050_StateData struct {
 	Element  *rod.Element
-	SleepMax float64
-	SleepMin float64
+	SleepMax int64
+	SleepMin int64
 }
 
-func (t *IsHistoryEntry) V051_FuncPre(state *state.State[V050_StateData]) *state.State[V050_StateData] {
+// sleep between min and max ms before each state
+func (t *IsHistoryEntry) V051_FuncPre() *state.State[V050_StateData] {
 	prefix := t.MyType + ".V051_FuncPre"
+	t.state.Name = prefix
 	var (
-		duration float64
+		duration int64
 	)
-	state.Name = prefix
-	ezlog.Debug().N(prefix).TxtStart().Out()
-	duration = state.Data.SleepMin + rand.Float64()*(state.Data.SleepMax-state.Data.SleepMin)
+	duration = t.state.Data.SleepMin + rand.Int64N(t.state.Data.SleepMax-t.state.Data.SleepMin)
 	ezlog.Info().N(prefix).N("sleep(ms)").M(int64(duration)).Out()
-	time.Sleep(time.Duration(duration) * time.Millisecond)
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return state
+	time.Sleep(time.Millisecond * time.Duration(duration))
+	return &t.state
 }
 
-func V051_OnErrFunc(state *state.State[V050_StateData]) *state.State[V050_StateData] {
-	errs.Queue(state.Name, state.Err)
-	return state
+func (t *IsHistoryEntry) V051_OnErrFunc() *state.State[V050_StateData] {
+	errs.Queue(t.state.Name, t.state.Err)
+	return &t.state
 }
 
-func (t *IsHistoryEntry) V0511_WaitStable(state *state.State[V050_StateData]) *state.State[V050_StateData] {
+func (t *IsHistoryEntry) V0511_WaitStable() *state.State[V050_StateData] {
 	prefix := t.MyType + ".V0511"
-	state.Name = prefix
-	ezlog.Debug().N(prefix).TxtStart().Out()
-	state.Err = t.Page.Keyboard.Press(input.Escape)
-	if state.Err == nil {
+	t.state.Name = prefix
+	t.state.Err = t.Page.Keyboard.Press(input.Escape)
+	if t.state.Err == nil {
 		t.Page.Mouse.Scroll(0, 12, 3)
 		// WaitPageStable(prefix, t.Page)
-		state.Next = t.V0512_3DotClick
+		t.state.Next = t.V0512_3DotClick
 	} else {
-		state.Next = t.V0511_WaitStable
+		t.state.Next = t.V0511_WaitStable
 	}
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return state
+	return &t.state
 }
 
 // Click the 3-dot button to open popup menu
-func (t *IsHistoryEntry) V0512_3DotClick(state *state.State[V050_StateData]) *state.State[V050_StateData] {
+func (t *IsHistoryEntry) V0512_3DotClick() *state.State[V050_StateData] {
 	prefix := t.MyType + ".V0512"
-	state.Name = prefix
-	ezlog.Debug().N(prefix).TxtStart().Out()
+	t.state.Name = prefix
 	var (
 		tags = []string{
 			"button",
@@ -363,69 +338,65 @@ func (t *IsHistoryEntry) V0512_3DotClick(state *state.State[V050_StateData]) *st
 	)
 	// select 3-dot
 	for _, tag := range tags {
-		state.Data.Element, state.Err = t.StateCurr.Element.Element(tag)
-		if state.Err == nil {
+		t.state.Data.Element, t.state.Err = t.StateCurr.Element.Element(tag)
+		if t.state.Err == nil {
 			break
 		}
 	}
-	if state.Err != nil {
-		state.Next = nil
+	if t.state.Err != nil {
+		t.state.Next = nil
 	}
-	ezlog.Debug().N(prefix).N("state.Err").M(state.Err).Out()
-	if state.Err == nil {
+	ezlog.Debug().N(prefix).N("t.state.Err").M(t.state.Err).Out()
+	if t.state.Err == nil {
 		// make 3-dot within screen
-		// state.Data.Element.MustVisible()
+		// t.state.Data.Element.MustVisible()
 		// click 3-dot
-		state.Err = state.Data.Element.Click(proto.InputMouseButtonLeft, 1)
+		t.state.Err = t.state.Data.Element.Click(proto.InputMouseButtonLeft, 1)
 		ezlog.Debug().N(prefix).M("clicked").Out()
 	}
-	if state.Err == nil {
-		state.Next = t.V0513_MenuSelect
+	if t.state.Err == nil {
+		t.state.Next = t.V0513_MenuSelect
 	} else {
-		state.Next = t.V0511_WaitStable
+		t.state.Next = t.V0511_WaitStable
 	}
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return state
+	return &t.state
 }
 
 // Select the popup menu
-func (t *IsHistoryEntry) V0513_MenuSelect(state *state.State[V050_StateData]) *state.State[V050_StateData] {
+func (t *IsHistoryEntry) V0513_MenuSelect() *state.State[V050_StateData] {
 	prefix := t.MyType + ".V0513"
-	state.Name = prefix
-	ezlog.Debug().N(prefix).TxtStart().Out()
+	t.state.Name = prefix
 	var (
 		elements rod.Elements
 		// tag      = "tp-yt-paper-listbox,tp-yt-iron-dropdown"
 		tag = "#contentWrapper"
 	)
 	// select menu
-	state.Data.Element = nil
-	elements, state.Err = t.Page.Elements(tag) // tag
-	if state.Err == nil {
+	t.state.Data.Element = nil
+	elements, t.state.Err = t.Page.Elements(tag) // tag
+	if t.state.Err == nil {
 		for _, element := range elements {
 			if element.MustVisible() {
-				state.Data.Element = element
-				state.Next = t.V0514_MenuRead
+				t.state.Data.Element = element
+				t.state.Next = t.V0514_MenuRead
 				break
 			}
 		}
-		if state.Data.Element == nil {
-			state.Err = errors.New("cannot select menu")
+		if t.state.Data.Element == nil {
+			t.state.Err = errors.New("cannot select menu")
 		}
 	}
-	if state.Err != nil {
-		state.Next = t.V0511_WaitStable
+	if t.state.Err != nil {
+		t.state.Next = t.V0511_WaitStable
 	}
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return state
+	return &t.state
 }
 
 // Read menu items
-func (t *IsHistoryEntry) V0514_MenuRead(state *state.State[V050_StateData]) *state.State[V050_StateData] {
+func (t *IsHistoryEntry) V0514_MenuRead() *state.State[V050_StateData] {
 	prefix := t.MyType + ".V0514"
-	state.Name = prefix
-	ezlog.Debug().N(prefix).TxtStart().Out()
-	// TraceElement(prefix, "", state.Element)
+	t.state.Name = prefix
+	// TraceElement(prefix, "", t.state.Element)
 	var (
 		matched         bool
 		menuItems       rod.Elements
@@ -433,40 +404,38 @@ func (t *IsHistoryEntry) V0514_MenuRead(state *state.State[V050_StateData]) *sta
 		menuItemTextReq = "Remove from watch history"
 		tag             = "ytd-menu-service-item-renderer,yt-list-item-view-model"
 	)
-	menuItems, state.Err = state.Data.Element.Elements(tag) // tag
-	if state.Err == nil {
+	menuItems, t.state.Err = t.state.Data.Element.Elements(tag) // tag
+	if t.state.Err == nil {
 		if len(menuItems) > 0 {
 			for _, item := range menuItems {
 				menuItemText = strings.TrimSpace(item.MustText())
 				ezlog.Trace().N(prefix).N("menuItems").M("'" + menuItemText + "'").Out()
 				if strings.EqualFold(menuItemText, menuItemTextReq) {
-					state.Data.Element = item
-					state.Next = t.V0515_MenuClick
+					t.state.Data.Element = item
+					t.state.Next = t.V0515_MenuClick
 					matched = true
 					break
 				}
 			}
 			if !matched {
-				TraceElement(prefix, "", state.Data.Element)
-				state.Err = errors.New("unmatch: " + menuItemTextReq)
+				TraceElement(prefix, "", t.state.Data.Element)
+				t.state.Err = errors.New("unmatch: " + menuItemTextReq)
 			}
 		} else {
-			state.Err = errors.New("0 menu item")
+			t.state.Err = errors.New("0 menu item")
 		}
 	}
-	if state.Err != nil {
-		state.Next = t.V0511_WaitStable
+	if t.state.Err != nil {
+		t.state.Next = t.V0511_WaitStable
 	}
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return state
+	return &t.state
 }
 
-// Click the item, use state.Element from V0513
-func (t *IsHistoryEntry) V0515_MenuClick(state *state.State[V050_StateData]) *state.State[V050_StateData] {
+// Click the item, use t.state.Element from V0513
+func (t *IsHistoryEntry) V0515_MenuClick() *state.State[V050_StateData] {
 	prefix := t.MyType + ".V0515"
-	state.Name = prefix
-	ezlog.Debug().N(prefix).TxtStart().Out()
-	TraceElement(prefix, "", state.Data.Element)
+	t.state.Name = prefix
+	TraceElement(prefix, "", t.state.Data.Element)
 	var (
 		x, y  float64
 		box   *proto.DOMRect
@@ -474,19 +443,19 @@ func (t *IsHistoryEntry) V0515_MenuClick(state *state.State[V050_StateData]) *st
 	)
 	{
 		// -- just click
-		// state.Err = state.Data.Element.Click(proto.InputMouseButtonLeft, 1)
+		// t.state.Err = t.state.Data.Element.Click(proto.InputMouseButtonLeft, 1)
 	}
 	{
 		// -- random position click
-		shape, state.Err = state.Data.Element.Shape()
-		if state.Err == nil {
+		shape, t.state.Err = t.state.Data.Element.Shape()
+		if t.state.Err == nil {
 			if shape == nil {
-				state.Err = errors.New("nil shape")
+				t.state.Err = errors.New("nil shape")
 			} else {
 				box = shape.Box()
 				ezlog.Trace().N(prefix).N("box").M(box).Out()
 				if box == nil {
-					state.Err = errors.New("nil box")
+					t.state.Err = errors.New("nil box")
 				} else {
 					x = box.X + 1 + rand.Float64()*(box.Width-2)
 					y = box.Y + 1 + rand.Float64()*(box.Height-2)
@@ -496,12 +465,11 @@ func (t *IsHistoryEntry) V0515_MenuClick(state *state.State[V050_StateData]) *st
 			}
 		}
 	}
-	if state.Err == nil {
-		state.Next = nil
+	if t.state.Err == nil {
+		t.state.Next = nil
 	} else {
-		// TraceElement(prefix, state.Err.Error(), state.Element)
-		state.Next = t.V0511_WaitStable
+		// TraceElement(prefix, t.state.Err.Error(), t.state.Element)
+		t.state.Next = t.V0511_WaitStable
 	}
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return state
+	return &t.state
 }

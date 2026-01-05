@@ -24,7 +24,7 @@ package cmd
 
 import (
 	"github.com/J-Siu/go-helper/v2/ezlog"
-	"github.com/J-Siu/go-is/v2/is"
+	"github.com/J-Siu/go-is/v3/is"
 	"github.com/J-Siu/yt-toolbox/v2/global"
 	"github.com/J-Siu/yt-toolbox/v2/lib"
 	"github.com/go-rod/rod"

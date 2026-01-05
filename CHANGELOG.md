@@ -18,3 +18,5 @@
   - use state machine when deleting history item
 - v2.0.2
   - use go-helper state machine
+- v2.0.3
+  - update go-helper, go-is

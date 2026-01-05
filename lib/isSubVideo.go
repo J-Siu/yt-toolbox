@@ -28,7 +28,7 @@ import (
 
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-helper/v2/str"
-	"github.com/J-Siu/go-is/v2/is"
+	"github.com/J-Siu/go-is/v3/is"
 	"github.com/go-rod/rod"
 )
 
@@ -67,25 +67,19 @@ func (t *IsSubVideo) override() {
 	t.V100_ScrollLoopEnd = t.override_V100_ScrollLoopEnd
 }
 
-func (t *IsSubVideo) override_V020_Elements(element *rod.Element) *rod.Elements {
+func (t *IsSubVideo) override_V020_Elements() {
 	prefix := t.MyType + ".V020_Elements"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
-	var elements rod.Elements
+	t.StateCurr.Name = prefix
 	tagName := "ytd-rich-item-renderer"
 	t.Page.MustElement(tagName)
-	elements = t.Page.MustElements(tagName)
-	ezlog.Debug().N(prefix).N("elements count").M(len(elements)).Out()
-
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return &elements
+	t.StateCurr.Elements = t.Page.MustElements(tagName)
+	ezlog.Debug().N(prefix).N("elements count").M(len(t.StateCurr.Elements)).Out()
 }
 
 // [element] : "ytd-rich-item-renderer" element from V20_elements()
-func (t *IsSubVideo) override_V030_ElementInfo() (infoP is.IInfo) {
+func (t *IsSubVideo) override_V030_ElementInfo() {
 	prefix := t.MyType + ".V030_ElementInfo"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
+	t.StateCurr.Name = prefix
 	if t.StateCurr.Element != nil {
 		var (
 			info    YT_Info
@@ -130,13 +124,13 @@ func (t *IsSubVideo) override_V030_ElementInfo() (infoP is.IInfo) {
 		}
 		// ---
 		ezlog.Debug().N(prefix).Lm(info).Out()
-		infoP = &info
+		t.StateCurr.ElementInfo = &info
 	}
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return infoP
 }
 
 func (t *IsSubVideo) override_V100_ScrollLoopEnd() {
+	prefix := t.MyType + ".V100_ScrollLoopEnd"
+	t.StateCurr.Name = prefix
 	if t.Day > 0 && t.StateCurr.Scroll {
 		t.ScrollMax = -1
 	}

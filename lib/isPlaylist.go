@@ -25,7 +25,7 @@ package lib
 import (
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-helper/v2/str"
-	"github.com/J-Siu/go-is/v2/is"
+	"github.com/J-Siu/go-is/v3/is"
 	"github.com/go-rod/rod"
 	"github.com/yosssi/gohtml"
 )
@@ -72,33 +72,27 @@ func (t *IsPlaylist) override() {
 	t.V040_ElementMatch = t.override_V040_ElementMatch
 }
 
-func (t *IsPlaylist) override_V010_Container() *rod.Element {
+func (t *IsPlaylist) override_V010_Container() {
 	prefix := t.MyType + ".V010_ElementsContainer"
-	ezlog.Debug().N(prefix).TxtStart().Out()
+	t.StateCurr.Name = prefix
 	byId := "#contents"
-	e := t.Page.MustElement(byId) // by id
+	t.Container = t.Page.MustElement(byId) // by id
 	if ezlog.GetLogLevel() == ezlog.TRACE {
-		ezlog.Trace().N(prefix).M(byId).Lm(gohtml.Format(e.MustHTML())).Out()
+		ezlog.Trace().N(prefix).M(byId).Lm(gohtml.Format(t.Container.MustHTML())).Out()
 	}
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return e
 }
 
-func (t *IsPlaylist) override_V020_Elements(element *rod.Element) *rod.Elements {
+func (t *IsPlaylist) override_V020_Elements() {
 	prefix := t.MyType + ".V020_Elements"
-	ezlog.Debug().N(prefix).TxtStart().Out()
+	t.StateCurr.Name = prefix
 	tagName := "ytd-rich-item-renderer"
-	elements := element.MustElements(tagName)
-	ezlog.Debug().N(prefix).N(tagName).N("element count").M(len(elements)).Out()
-
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return &elements
+	t.StateCurr.Elements = t.Container.MustElements(tagName)
+	ezlog.Debug().N(prefix).N(tagName).N("element count").M(len(t.StateCurr.Elements)).Out()
 }
 
-func (t *IsPlaylist) override_V030_ElementInfo() (infoP is.IInfo) {
+func (t *IsPlaylist) override_V030_ElementInfo() {
 	prefix := t.MyType + ".V030_ElementInfo"
-	ezlog.Debug().N(prefix).TxtStart().Out()
-
+	t.StateCurr.Name = prefix
 	if t.StateCurr.Element != nil {
 		var info YT_Info
 		if ezlog.GetLogLevel() == ezlog.TRACE {
@@ -119,17 +113,18 @@ func (t *IsPlaylist) override_V030_ElementInfo() (infoP is.IInfo) {
 				info.Url = YT_FullUrl(*s.MustAttribute("href"))
 			}
 		}
-		infoP = &info
+		t.StateCurr.ElementInfo = &info
 	}
-
-	ezlog.Debug().N(prefix).TxtEnd().Out()
-	return infoP
 }
 
-func (t *IsPlaylist) override_V040_ElementMatch() (matched bool, matchedStr string) {
+func (t *IsPlaylist) override_V040_ElementMatch() {
 	prefix := t.MyType + ".V040_ElementMatch"
-	yt_Info := t.StateCurr.ElementInfo.(*YT_Info)
-	matched = true // default to matched
+	t.StateCurr.Name = prefix
+	var (
+		yt_Info         = t.StateCurr.ElementInfo.(*YT_Info)
+		matched    bool = true // start with matched
+		matchedStr string
+	)
 	if len(*t.Include) != 0 {
 		matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, t.Include, false)
 	}
@@ -140,6 +135,7 @@ func (t *IsPlaylist) override_V040_ElementMatch() (matched bool, matchedStr stri
 			matched = false
 		}
 	}
+	t.StateCurr.ElementInfo.SetMatched(matched)
+	t.StateCurr.ElementInfo.SetMatchedStr(matchedStr)
 	ezlog.Trace().N(prefix).N("matched").M(matched).N("matchedStr").M(matchedStr).Out()
-	return matched, matchedStr
 }
