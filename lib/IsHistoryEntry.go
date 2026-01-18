@@ -234,7 +234,7 @@ func (t *IsHistoryEntry) override_V080_ElementScrollable() {
 	prefix := t.MyType + ".V080_ElementScrollable"
 	t.StateCurr.Name = prefix
 	info := t.StateCurr.ElementInfo.(*YT_Info)
-	t.StateCurr.Scrollable = !t.Deleted && (len(info.Title) == 0 || !t.StateCurr.Element.MustVisible())
+	t.StateCurr.ElementScrollable = !t.Deleted && (len(info.Title) == 0 || !t.StateCurr.Element.MustVisible())
 }
 
 func (t *IsHistoryEntry) override_V100_ScrollLoopEnd() {
