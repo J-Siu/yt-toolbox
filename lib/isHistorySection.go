@@ -132,7 +132,7 @@ func (t *IsHistorySection) override_V070_ElementProcess() {
 		} else {
 			mode = is.PrintMatched
 		}
-		ezlog.Log().M("#|match|video|ch|desc").Out()
+		ezlog.Log().M("no|match|video|ch|desc").Out()
 		ezlog.Log().M("--|--|--|--|--").Out()
 		isHistoryEntry.IInfoList.Print(mode)
 	}
