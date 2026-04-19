@@ -34,9 +34,9 @@ import (
 	"github.com/J-Siu/go-helper/v2/state"
 	"github.com/J-Siu/go-helper/v2/str"
 	"github.com/J-Siu/go-is/v3/is"
-	"github.com/go-rod/rod"
-	"github.com/go-rod/rod/lib/input"
-	"github.com/go-rod/rod/lib/proto"
+	"github.com/runZeroInc/go-rod"
+	"github.com/runZeroInc/go-rod/lib/input"
+	"github.com/runZeroInc/go-rod/lib/proto"
 	"github.com/yosssi/gohtml"
 )
 

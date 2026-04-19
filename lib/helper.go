@@ -28,7 +28,7 @@ import (
 
 	"github.com/J-Siu/go-dtquery/dq"
 	"github.com/J-Siu/go-helper/v2/ezlog"
-	"github.com/go-rod/rod"
+	"github.com/runZeroInc/go-rod"
 	"github.com/yosssi/gohtml"
 )
 

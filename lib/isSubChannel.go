@@ -25,7 +25,7 @@ package lib
 import (
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-is/v3/is"
-	"github.com/go-rod/rod"
+	"github.com/runZeroInc/go-rod"
 )
 
 type IsSubChannel struct {

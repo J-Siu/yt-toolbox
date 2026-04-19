@@ -20,3 +20,6 @@
   - use go-helper state machine
 - v2.0.3
   - update go-helper, go-is
+- v2.0.4
+  - update go-helper, go-is, go-dtquery, go version
+  - replace go-rod/rod with runZeroInc/go-rod
