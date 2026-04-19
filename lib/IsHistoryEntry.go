@@ -156,7 +156,8 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() {
 				}
 			}
 		} else {
-			by = ".yt-lockup-metadata-view-model__text-container" //by class
+			// by = ".yt-lockup-metadata-view-model__text-container" //by class
+			by = ".ytLockupMetadataViewModelTextContainer" // by class
 			elementMeta, err = t.StateCurr.Element.Element(by)
 			if err == nil {
 				// -- trace
@@ -170,7 +171,7 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() {
 				elementsText = elementMeta.MustElements(by)
 				elementsTextCount = len(elementsText)
 				ezlog.Info().N(prefix).N(by).N("elementsText len").M(elementsTextCount).Out()
-				if elementsTextCount != 4 {
+				if elementsTextCount < 2 {
 					ezlog.Warning().N(prefix).N(by).M("YT changed format").Out()
 				}
 				for i, e := range elementsText {
@@ -179,8 +180,9 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() {
 				// info.Title = elementsText[0].MustText()
 				info.ChName = elementsText[1].MustText()
 				switch elementsTextCount {
-				case 3:
+				case 2:
 					// member video don't have views
+				case 3:
 					info.Text = elementsText[2].MustText()
 				case 4:
 					info.Text = elementsText[3].MustText()
