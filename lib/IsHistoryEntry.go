@@ -57,13 +57,14 @@ type IsHistoryEntry struct {
 	state state.State[V050_StateData]
 }
 
-func (t *IsHistoryEntry) New(property *is.Property, del bool, remove bool, filter *[]string) *IsHistoryEntry {
+func (t *IsHistoryEntry) New(property *is.Property, del bool, remove bool, filter *[]string, verbose bool) *IsHistoryEntry {
 	t.Processor.New(property) // Init the base struct
 	t.MyType = "IsHistoryEntry"
 
 	t.Filter = append(t.Filter, *filter...)
 	t.Del = del
 	t.Remove = remove
+	t.Verbose = verbose
 	t.override()
 
 	t.state = state.State[V050_StateData]{
@@ -82,6 +83,7 @@ func (t *IsHistoryEntry) New(property *is.Property, del bool, remove bool, filte
 
 func (t *IsHistoryEntry) Run() *IsHistoryEntry {
 	t.Processor.Run()
+	t.Print()
 	return t
 }
 
@@ -474,4 +476,19 @@ func (t *IsHistoryEntry) V0515_MenuClick() *state.State[V050_StateData] {
 		t.state.Next = t.V0511_WaitStable
 	}
 	return &t.state
+}
+
+func (t *IsHistoryEntry) Print() *IsHistoryEntry {
+	var mode is.IInfoListPrintMode
+
+	if t.Verbose {
+		mode = is.PrintAll
+	} else {
+		mode = is.PrintMatched
+	}
+	ezlog.Log().M("no|match|video|ch|desc").Out()
+	ezlog.Log().M("--|--|--|--|--").Out()
+	t.IInfoList.Print(mode)
+
+	return t
 }

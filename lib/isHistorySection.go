@@ -119,22 +119,14 @@ func (t *IsHistorySection) override_V070_ElementProcess() {
 	if len(titles) != 0 && len((titles)[0]) != 0 {
 		var (
 			isHistoryEntry IsHistoryEntry
-			mode           is.IInfoListPrintMode
 			property       = is.Property{
 				Container: t.StateCurr.Element,
 				IInfoList: new(is.IInfoList),
 				Page:      t.Page,
 			}
 		)
-		isHistoryEntry.New(&property, t.Del, t.Remove, &t.Filter).Run()
-		if t.Verbose {
-			mode = is.PrintAll
-		} else {
-			mode = is.PrintMatched
-		}
-		ezlog.Log().M("no|match|video|ch|desc").Out()
-		ezlog.Log().M("--|--|--|--|--").Out()
-		isHistoryEntry.IInfoList.Print(mode)
+		isHistoryEntry.
+			New(&property, t.Del, t.Remove, &t.Filter, t.Verbose).Run()
 	}
 }
 
