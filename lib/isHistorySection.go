@@ -121,7 +121,6 @@ func (t *IsHistorySection) override_V070_ElementProcess() {
 			isHistoryEntry IsHistoryEntry
 			property       = is.Property{
 				Container: t.StateCurr.Element,
-				IInfoList: new(is.IInfoList),
 				Page:      t.Page,
 			}
 		)
