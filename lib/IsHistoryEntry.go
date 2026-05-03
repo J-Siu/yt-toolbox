@@ -44,15 +44,14 @@ import (
 type IsHistoryEntry struct {
 	is.Processor
 
-	ClickSleep  float64 // in second
-	Del         bool    // delete entry from history
-	Deleted     bool    // In Run(), elements loop, current element is deleted or not
-	Desc        bool    // false;
-	PrintHeader bool    // true;
-	Remove      bool    // remove entry from screen
-	Standalone  bool    // false;
-	Verbose     bool    // false;
-	Filter      []string
+	ClickSleep float64 // in second
+	Del        bool    // delete entry from history
+	Deleted    bool    // In Run(), elements loop, current element is deleted or not
+	Desc       bool    // false;
+	Remove     bool    // remove entry from screen
+	Standalone bool    // false;
+	Verbose    bool    // false;
+	Filter     []string
 
 	state state.State[V050_StateData]
 }
@@ -61,6 +60,7 @@ func (t *IsHistoryEntry) New(property *is.Property, del bool, remove bool, filte
 	t.Processor.New(property) // Init the base struct
 	t.MyType = "IsHistoryEntry"
 
+	t.IInfoList = new(is.IInfoList)
 	t.Filter = append(t.Filter, *filter...)
 	t.Del = del
 	t.Remove = remove
@@ -195,10 +195,12 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() {
 						Out()
 				}
 			} else {
-				ezlog.Err().N(prefix).N("YT format not recognize").
-					Ln("element").Lm(t.StateCurr.Element).
-					Ln("html").Lm(gohtml.Format(t.StateCurr.Element.MustHTML())).
-					Out()
+				if elementMeta, err = t.StateCurr.Element.Element(".ytDismissibleItemReplacedContent"); err != nil {
+					ezlog.Err().N(prefix).N("YT format not recognize").
+						Ln("element").Lm(t.StateCurr.Element).
+						Ln("html").Lm(gohtml.Format(t.StateCurr.Element.MustHTML())).
+						Out()
+				}
 			}
 		}
 		t.StateCurr.ElementInfo = &info
@@ -479,16 +481,29 @@ func (t *IsHistoryEntry) V0515_MenuClick() *state.State[V050_StateData] {
 }
 
 func (t *IsHistoryEntry) Print() *IsHistoryEntry {
-	var mode is.IInfoListPrintMode
+	var (
+		infoList *is.IInfoList
+		mode     is.IInfoListPrintMode
+	)
 
 	if t.Verbose {
 		mode = is.PrintAll
+		infoList = t.IInfoList
 	} else {
 		mode = is.PrintMatched
+		infoList = new(is.IInfoList)
+		for _, info := range *t.IInfoList {
+			if info.Matched() {
+				*infoList = append(*infoList, info)
+			}
+		}
 	}
-	ezlog.Log().M("no|match|video|ch|desc").Out()
-	ezlog.Log().M("--|--|--|--|--").Out()
-	t.IInfoList.Print(mode)
+
+	if len(*infoList) > 0 {
+		ezlog.Log().M("no|match|video|ch|desc").Out()
+		ezlog.Log().M("--|--|--|--|--").Out()
+		infoList.Print(mode)
+	}
 
 	return t
 }
