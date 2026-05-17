@@ -101,7 +101,7 @@ func (t *IsHistorySection) override_V030_ElementInfo() {
 
 		for j, item := range elements {
 			title := item.MustText()
-			tmp := "## Section[" + *strany.Any(t.StateCurr.ElementIndex) + "] Title[" + *strany.Any(j) + "]"
+			tmp := "## Section[" + strany.Any(t.StateCurr.ElementIndex) + "] Title[" + strany.Any(j) + "]"
 			ezlog.Log().L().N(tmp).M(title).Out()
 			info.Titles = append(info.Titles, title)
 		}

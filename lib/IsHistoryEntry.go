@@ -218,7 +218,7 @@ func (t *IsHistoryEntry) override_V040_ElementMatch() {
 	t.Deleted = false
 	info := t.StateCurr.ElementInfo.(*YT_Info)
 	chkStr := info.Title + " " + info.Text + " " + info.ChName + " " + info.ChUrlShort
-	matched, matchedStr = str.ContainsAnySubStrings(&chkStr, &t.Filter, false)
+	matched, matchedStr = str.ContainsAnySubStrings(chkStr, &t.Filter, false)
 	t.StateCurr.ElementInfo.SetMatched(matched)
 	t.StateCurr.ElementInfo.SetMatchedStr(matchedStr)
 }

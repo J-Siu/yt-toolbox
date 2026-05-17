@@ -23,3 +23,5 @@
 - v2.0.4
   - update go-helper, go-is, go-dtquery, go version
   - replace go-rod/rod with runZeroInc/go-rod
+- v2.0.5
+  - update go-helper/v2

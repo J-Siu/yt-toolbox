@@ -106,7 +106,7 @@ func (t *IsSubVideo) override_V030_ElementInfo() {
 					excludeText := []string{"views", "watch", "scheduled"}
 					for _, eRole := range eRoles {
 						text := eRole.MustText()
-						if !str.ContainsAnySubStringsBool(&text, &excludeText, false) {
+						if !str.ContainsAnySubStringsBool(text, &excludeText, false) {
 							info.Text = text
 							t.dayScroll(&text)
 						}

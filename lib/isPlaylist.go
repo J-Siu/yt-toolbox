@@ -126,11 +126,11 @@ func (t *IsPlaylist) override_V040_ElementMatch() {
 		matchedStr string
 	)
 	if len(*t.Include) != 0 {
-		matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, t.Include, false)
+		matched, matchedStr = str.ContainsAnySubStrings(yt_Info.Title, t.Include, false)
 	}
 	// Exclude override Include
 	if len(*t.Exclude) != 0 {
-		matched, matchedStr = str.ContainsAnySubStrings(&yt_Info.Title, t.Exclude, false)
+		matched, matchedStr = str.ContainsAnySubStrings(yt_Info.Title, t.Exclude, false)
 		if matched {
 			matched = false
 		}
