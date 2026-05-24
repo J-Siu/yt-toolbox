@@ -23,7 +23,7 @@ THE SOFTWARE.
 package lib
 
 import (
-	is "github.com/J-Siu/go-is/v3/is"
+	"github.com/J-Siu/go-is/v3/is"
 	"github.com/J-Siu/yt-toolbox/v2/global"
 )
 

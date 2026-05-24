@@ -4,9 +4,9 @@ go 1.26.3
 
 require (
 	github.com/J-Siu/go-dtquery v1.2.4
-	github.com/J-Siu/go-helper/v2 v2.8.2
-	github.com/J-Siu/go-is/v3 v3.0.3
-	github.com/runZeroInc/go-rod v0.0.27 // github.com/go-rod/rod
+	github.com/J-Siu/go-helper/v2 v2.8.4
+	github.com/J-Siu/go-is/v3 v3.0.4
+	github.com/runZeroInc/go-rod v0.0.29 // replace github.com/go-rod/rod
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/yosssi/gohtml v0.0.0-20201013000340-ee4748c638f4
@@ -28,7 +28,7 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/net v0.54.0 // indirect
-	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
 )

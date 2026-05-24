@@ -23,6 +23,8 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"sort"
+
 	"github.com/J-Siu/go-is/v3/is"
 	"github.com/J-Siu/yt-toolbox/v2/global"
 	"github.com/J-Siu/yt-toolbox/v2/lib"
@@ -44,6 +46,7 @@ var subChannelCmd = &cobra.Command{
 				global.Flag.ScrollMax).
 			Run()
 		if isSubCh.Err == nil {
+			sort.Sort(isSubCh.IInfoList)
 			isSubCh.IInfoList.Print(is.PrintAll)
 		}
 	},

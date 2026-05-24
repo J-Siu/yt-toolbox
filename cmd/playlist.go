@@ -23,6 +23,8 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"sort"
+
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-is/v3/is"
 	"github.com/J-Siu/yt-toolbox/v2/global"
@@ -49,6 +51,7 @@ var playlistCmd = &cobra.Command{
 
 		if isPlaylist.Err == nil {
 			ezlog.Log().N("Playlist").Out()
+			sort.Sort(isPlaylist.IInfoList)
 			isPlaylist.IInfoList.Print(is.PrintMatched)
 			if global.FlagPlaylist.GetList {
 				for _, info := range *isPlaylist.IInfoList {
