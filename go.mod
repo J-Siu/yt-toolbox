@@ -6,7 +6,7 @@ require (
 	github.com/J-Siu/go-dtquery v1.2.4
 	github.com/J-Siu/go-helper/v2 v2.8.4
 	github.com/J-Siu/go-is/v3 v3.0.4
-	github.com/runZeroInc/go-rod v0.0.29 // replace github.com/go-rod/rod
+	github.com/runZeroInc/go-rod v0.0.31 // replace github.com/go-rod/rod
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/yosssi/gohtml v0.0.0-20201013000340-ee4748c638f4

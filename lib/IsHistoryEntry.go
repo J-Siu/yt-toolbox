@@ -135,7 +135,7 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() {
 
 				meta := t.StateCurr.Element.MustElement("#metadata") // by id
 				a := meta.MustElement("a")                           // by name
-				info.ChName = strings.TrimSpace(a.MustText())
+				info.ChTitle = strings.TrimSpace(a.MustText())
 
 				if a != nil {
 					chUrlP := a.MustAttribute("href")
@@ -173,7 +173,7 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() {
 					ezlog.Info().N(prefix).N(by).N(i).M(e.MustText()).Out()
 				}
 				// info.Title = elementsText[0].MustText()
-				info.ChName = elementsText[1].MustText()
+				info.ChTitle = elementsText[1].MustText()
 				switch elementsTextCount {
 				case 2:
 					// member video don't have views
@@ -202,7 +202,7 @@ func (t *IsHistoryEntry) override_V040_ElementMatch() {
 	t.StateCurr.Name = prefix
 	t.Deleted = false
 	info := t.StateCurr.ElementInfo.(*YT_Info)
-	chkStr := info.Title + " " + info.Text + " " + info.ChName + " " + info.ChUrlShort
+	chkStr := info.Title + " " + info.Text + " " + info.ChTitle + " " + info.ChUrlShort
 	matched, matchedStr = str.ContainsAnySubStrings(chkStr, &t.Filter, false)
 	t.StateCurr.ElementInfo.SetMatched(matched)
 	t.StateCurr.ElementInfo.SetMatchedStr(matchedStr)

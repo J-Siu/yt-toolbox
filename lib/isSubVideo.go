@@ -96,7 +96,7 @@ func (t *IsSubVideo) override_V030_ElementInfo() {
 			// Meta element -> link(<a>) block
 			a, e2 := eMeta.Element("a")
 			if e2 == nil {
-				info.ChName = a.MustText()
+				info.ChTitle = a.MustText()
 				info.ChUrlShort = UrlDecode(*a.MustAttribute("href"))
 				info.ChUrl = YT_FullUrl(info.ChUrlShort)
 				// Meta element -> elements with [role]='text' attribute

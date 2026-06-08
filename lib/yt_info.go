@@ -33,7 +33,7 @@ type YT_Info struct {
 
 	// --- Channel info
 	ChId       string `json:"ChId,omitempty"`
-	ChName     string `json:"ChName,omitempty"`
+	ChTitle    string `json:"ChName,omitempty"`
 	ChUrl      string `json:"ChUrl,omitempty"`
 	ChUrlShort string `json:"ChUrlShort,omitempty"`
 	// --- Video info
@@ -44,7 +44,7 @@ type YT_Info struct {
 }
 
 func (t *YT_Info) String() string {
-	str := "[" + t.Title + "](" + UrlDecode(t.Url) + ") | [" + t.ChName + "](" + t.ChUrl + ") | " + t.ChId
+	str := "[" + t.Title + "](" + UrlDecode(t.Url) + ") | [" + t.ChTitle + "](" + t.ChUrl + ") | " + t.ChId
 	if global.Flag.Desc {
 		str += " | " + t.Text
 	}
