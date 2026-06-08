@@ -44,9 +44,9 @@ type YT_Info struct {
 }
 
 func (t *YT_Info) String() string {
+	str := "[" + t.Title + "](" + UrlDecode(t.Url) + ") | [" + t.ChName + "](" + t.ChUrl + ") | " + t.ChId
 	if global.Flag.Desc {
-		return "[" + t.Title + "](" + UrlDecode(t.Url) + ") | [" + t.ChName + "](" + t.ChUrl + ") | " + t.Text
-	} else {
-		return "[" + t.Title + "](" + UrlDecode(t.Url) + ") | [" + t.ChName + "](" + t.ChUrl + ")"
+		str += " | " + t.Text
 	}
+	return str
 }
