@@ -1,6 +1,11 @@
 package lib
 
-import "strings"
+import (
+	"errors"
+	"strings"
+
+	"github.com/J-Siu/go-helper/v2/errs"
+)
 
 // var 'ytinitialdata' from channel page
 type YTInitialData struct {
@@ -44,11 +49,17 @@ type ChId string
 type ChTitleID map[ChTitle]ChId
 
 func (t ChTitleID) New(data *YTInitialData) {
+	prefix := "ChTitleID.New"
+	var title string
 	for _, tab := range data.Contents.TwoColumnBrowseResultsRenderer.Tabs {
 		for _, content1 := range tab.TabRenderer.Content.SectionListRenderer.Contents {
 			for _, content2 := range content1.ItemSectionRenderer.Contents {
 				for _, item := range content2.ShelfRenderer.Content.ExpandedShelfContentsRenderer.Items {
-					t[ChTitle(strings.TrimSpace(item.ChannelRenderer.Title.SimpleText))] = ChId(strings.TrimSpace(item.ChannelRenderer.ChannelID))
+					title = strings.TrimSpace(item.ChannelRenderer.Title.SimpleText)
+					if title == "" {
+						errs.Queue(prefix, errors.New("Empty channel title: "+item.ChannelRenderer.ChannelID))
+					}
+					t[ChTitle(title)] = ChId(strings.TrimSpace(item.ChannelRenderer.ChannelID))
 				}
 			}
 		}
