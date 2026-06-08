@@ -32,10 +32,10 @@ type YT_Info struct {
 	is.InfoBase
 
 	// --- Channel info
+	ChId       string `json:"ChId,omitempty"`
 	ChName     string `json:"ChName,omitempty"`
 	ChUrl      string `json:"ChUrl,omitempty"`
 	ChUrlShort string `json:"ChUrlShort,omitempty"`
-
 	// --- Video info
 	Text   string   `json:"Text,omitempty"`
 	Title  string   `json:"Title,omitempty"`
