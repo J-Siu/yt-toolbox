@@ -24,6 +24,7 @@ package lib
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-is/v3/is"
@@ -89,8 +90,8 @@ func (t *IsSubChannel) override_V030_ElementInfo() {
 	t.StateCurr.Name = prefix
 	if t.StateCurr.Element != nil {
 		var info YT_Info
-		info.ChName = t.StateCurr.Element.MustElement("#text").MustText()
-		info.ChId = string(t.TitleId[ChTitle(info.Title)])
+		info.ChName = strings.TrimSpace(t.StateCurr.Element.MustElement("#text").MustText())
+		info.ChId = string(t.TitleId[ChTitle(info.ChName)])
 		info.ChUrl = YT_FullUrl(*t.StateCurr.Element.MustElement("#main-link").MustAttribute("href"))
 		TraceElement(ezlog.TRACE, prefix, "", t.StateCurr.Element)
 		t.StateCurr.ElementInfo = &info
