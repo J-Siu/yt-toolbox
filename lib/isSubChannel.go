@@ -91,7 +91,7 @@ func (t *IsSubChannel) override_V030_ElementInfo() {
 	if t.StateCurr.Element != nil {
 		var info YT_Info
 		info.ChTitle = strings.TrimSpace(t.StateCurr.Element.MustElement("#text").MustText())
-		info.ChId = string(t.TitleId[ChTitle(info.ChTitle)])
+		info.ChId = string(t.TitleId[info.ChTitle])
 		info.ChUrl = YT_FullUrl(*t.StateCurr.Element.MustElement("#main-link").MustAttribute("href"))
 		TraceElement(ezlog.TRACE, prefix, "", t.StateCurr.Element)
 		t.StateCurr.ElementInfo = &info

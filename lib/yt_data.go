@@ -43,10 +43,8 @@ type YTInitialData struct {
 	} `json:"contents"`
 }
 
-// map key:title, value:id
-type ChTitle string
-type ChId string
-type ChTitleID map[ChTitle]ChId
+// map (key,value) => (title,id)
+type ChTitleID map[string]string
 
 func (t ChTitleID) New(data *YTInitialData) {
 	prefix := "ChTitleID.New"
@@ -59,7 +57,7 @@ func (t ChTitleID) New(data *YTInitialData) {
 					if title == "" {
 						errs.Queue(prefix, errors.New("Empty channel title: "+item.ChannelRenderer.ChannelID))
 					}
-					t[ChTitle(title)] = ChId(strings.TrimSpace(item.ChannelRenderer.ChannelID))
+					t[title] = strings.TrimSpace(item.ChannelRenderer.ChannelID)
 				}
 			}
 		}
