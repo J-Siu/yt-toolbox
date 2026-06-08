@@ -1,6 +1,6 @@
 # YT Toolbox
 
-A command line program to extract youtube subscriptions, playlist and history. Using [go-is](https://github.com/J-Siu/go-is) and [rod](https://github.com/go-rod/rod).
+A command line program to extract youtube subscriptions, playlist and history. Using [go-is](https://github.com/J-Siu/go-is) and [rod](github.com/runZeroInc/go-rod).
 
 - [Install](#install)
 - [Usage](#usage)
@@ -26,10 +26,7 @@ Download
 YouTube toolbox
 
 Usage:
-  go-yt-toolbox [command]
-
-Aliases:
-  go-yt-toolbox, gyt
+  yt-toolbox [command]
 
 Available Commands:
   completion   Generate the autocompletion script for the specified shell
@@ -40,17 +37,16 @@ Available Commands:
   subscription Youtube Subscriptions
 
 Flags:
-      --DevToolsHost string   Devtools Host
-      --DevToolsPort int      Devtools Port (default 9222)
-      --DevToolsUrl string    Devtools Url (override Devtools host, ver and port)
-      --DevToolsVer string    Devtools Version
-  -c, --config string         Config file (default "$HOME/.config/yt-toolbox.json")
-      --debug                 Enable debug
-  -h, --help                  help for go-yt-toolbox
-  -s, --scroll-max int        Unlimited -1
-      --trace                 Enable trace (include debug)
-  -v, --verbose               Verbose
-      --version               version for go-yt-toolbox
+  -c, --config string    Config file (default "$HOME/.config/yt-toolbox.json")
+  -d, --debug            Enable debug
+      --desc             Show description
+  -h, --help             help for yt-toolbox
+      --host string      Devtools Host
+      --port uint        Devtools Port
+  -s, --scroll-max int   Unlimited -1 (default: 0)
+  -t, --trace            Enable trace (include debug)
+  -v, --verbose          Verbose
+      --version          version for yt-toolbox
 
 Use "yt-toolbox [command] --help" for more information about a command.
 ```
