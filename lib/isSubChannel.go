@@ -23,6 +23,8 @@ THE SOFTWARE.
 package lib
 
 import (
+	"encoding/json"
+
 	"github.com/J-Siu/go-helper/v2/ezlog"
 	"github.com/J-Siu/go-is/v3/is"
 	"github.com/runZeroInc/go-rod"
@@ -30,6 +32,7 @@ import (
 
 type IsSubChannel struct {
 	*is.Processor
+	TitleId ChTitleID
 }
 
 func (t *IsSubChannel) New(page *rod.Page, urlStr string, scrollMax int) *IsSubChannel {
@@ -43,6 +46,8 @@ func (t *IsSubChannel) New(page *rod.Page, urlStr string, scrollMax int) *IsSubC
 	t.Processor = is.New(&property) // Init the base struct
 	t.MyType = "IsSubChannel"
 
+	t.TitleId = make(ChTitleID)
+
 	t.override()
 	return t
 }
@@ -53,8 +58,23 @@ func (t *IsSubChannel) Run() *IsSubChannel {
 }
 
 func (t *IsSubChannel) override() {
+	t.V010_Container = t.override_V010_Container
 	t.V020_Elements = t.override_V020_Elements
 	t.V030_ElementInfo = t.override_V030_ElementInfo
+}
+
+func (t *IsSubChannel) override_V010_Container() {
+	prefix := t.MyType + ".V010_Container"
+	t.StateCurr.Name = prefix
+
+	var data YTInitialData
+	j := t.Page.MustEval(`() => JSON.stringify(ytInitialData)`).String()
+	if t.Err = json.Unmarshal([]byte(j), &data); t.Err == nil {
+		t.TitleId.New(&data)
+		if ezlog.GetLogLevel() == ezlog.TRACE {
+			ezlog.Trace().N(prefix).Nl("TitleId").M(t.TitleId).Out()
+		}
+	}
 }
 
 func (t *IsSubChannel) override_V020_Elements() {
@@ -69,8 +89,9 @@ func (t *IsSubChannel) override_V030_ElementInfo() {
 	t.StateCurr.Name = prefix
 	if t.StateCurr.Element != nil {
 		var info YT_Info
-		info.Title = t.StateCurr.Element.MustElement("#text").MustText()
-		info.Url = YT_FullUrl(*t.StateCurr.Element.MustElement("#main-link").MustAttribute("href"))
+		info.ChName = t.StateCurr.Element.MustElement("#text").MustText()
+		info.ChId = string(t.TitleId[ChTitle(info.Title)])
+		info.ChUrl = YT_FullUrl(*t.StateCurr.Element.MustElement("#main-link").MustAttribute("href"))
 		TraceElement(ezlog.TRACE, prefix, "", t.StateCurr.Element)
 		t.StateCurr.ElementInfo = &info
 	}
