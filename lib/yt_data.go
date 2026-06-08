@@ -1,5 +1,7 @@
 package lib
 
+import "strings"
+
 // var 'ytinitialdata' from channel page
 type YTInitialData struct {
 	Contents struct {
@@ -46,7 +48,7 @@ func (t ChTitleID) New(data *YTInitialData) {
 		for _, content1 := range tab.TabRenderer.Content.SectionListRenderer.Contents {
 			for _, content2 := range content1.ItemSectionRenderer.Contents {
 				for _, item := range content2.ShelfRenderer.Content.ExpandedShelfContentsRenderer.Items {
-					t[ChTitle(item.ChannelRenderer.Title.SimpleText)] = ChId(item.ChannelRenderer.ChannelID)
+					t[ChTitle(strings.TrimSpace(item.ChannelRenderer.Title.SimpleText))] = ChId(strings.TrimSpace(item.ChannelRenderer.ChannelID))
 				}
 			}
 		}
