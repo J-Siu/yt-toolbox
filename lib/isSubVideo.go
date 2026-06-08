@@ -118,9 +118,7 @@ func (t *IsSubVideo) override_V030_ElementInfo() {
 		if err != nil {
 			// These are shorts with no meta block
 			info.Text = "Short"
-			// if ezlog.GetLogLevel() == ezlog.TRACE {
-			// ezlog.Trace().N(prefix).Ln("Err element").M(gohtml.Format(t.StateCurr.Element.MustHTML())).Out()
-			// }
+			// TraceElement(prefix, "", t.StateCurr.Element)
 		}
 		// ---
 		ezlog.Debug().N(prefix).Lm(info).Out()

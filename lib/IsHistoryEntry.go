@@ -37,7 +37,6 @@ import (
 	"github.com/runZeroInc/go-rod"
 	"github.com/runZeroInc/go-rod/lib/input"
 	"github.com/runZeroInc/go-rod/lib/proto"
-	"github.com/yosssi/gohtml"
 )
 
 // process YT history by entry
@@ -128,13 +127,7 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() {
 		elementMeta, err = t.StateCurr.Element.Element(by) // by id
 		if err == nil {
 			// -- trace
-			if ezlog.GetLogLevel() == ezlog.TRACE {
-				ezlog.Info().N(prefix).
-					// Ln("element").Lm(t.StateCurr.Element).
-					// Ln("html").Lm(gohtml.Format(t.StateCurr.Element.MustHTML())).
-					Ln(by).Lm(gohtml.Format(elementMeta.MustHTML())).
-					Out()
-			}
+			TraceElement(ezlog.TRACE, prefix, "", elementMeta)
 			info.Title = strings.TrimSpace(elementMeta.MustText())
 			if len(info.Title) != 0 {
 				info.Url = YT_FullUrl(*elementMeta.MustAttribute("href"))
@@ -189,18 +182,10 @@ func (t *IsHistoryEntry) override_V030_ElementInfo() {
 				case 4:
 					info.Text = elementsText[3].MustText()
 				default:
-					ezlog.Err().N(prefix).N(by).
-						Ln("element").Lm(t.StateCurr.Element).
-						Ln("html").Lm(gohtml.Format(t.StateCurr.Element.MustHTML())).
-						Out()
+					TraceElement(ezlog.ERR, prefix, by, t.StateCurr.Element)
 				}
 			} else {
-				if elementMeta, err = t.StateCurr.Element.Element(".ytDismissibleItemReplacedContent"); err != nil {
-					ezlog.Err().N(prefix).N("YT format not recognize").
-						Ln("element").Lm(t.StateCurr.Element).
-						Ln("html").Lm(gohtml.Format(t.StateCurr.Element.MustHTML())).
-						Out()
-				}
+				TraceElement(ezlog.ERR, prefix, "YT format not recognize", t.StateCurr.Element)
 			}
 		}
 		t.StateCurr.ElementInfo = &info
@@ -424,7 +409,7 @@ func (t *IsHistoryEntry) V0514_MenuRead() *state.State[V050_StateData] {
 				}
 			}
 			if !matched {
-				TraceElement(prefix, "", t.state.Data.Element)
+				TraceElement(ezlog.TRACE, prefix, "", t.state.Data.Element)
 				t.state.Err = errors.New("unmatch: " + menuItemTextReq)
 			}
 		} else {
@@ -441,7 +426,7 @@ func (t *IsHistoryEntry) V0514_MenuRead() *state.State[V050_StateData] {
 func (t *IsHistoryEntry) V0515_MenuClick() *state.State[V050_StateData] {
 	prefix := t.MyType + ".V0515"
 	t.state.Name = prefix
-	TraceElement(prefix, "", t.state.Data.Element)
+	TraceElement(ezlog.TRACE, prefix, "", t.state.Data.Element)
 	var (
 		x, y  float64
 		box   *proto.DOMRect

@@ -71,7 +71,7 @@ func (t *IsSubChannel) override_V030_ElementInfo() {
 		var info YT_Info
 		info.Title = t.StateCurr.Element.MustElement("#text").MustText()
 		info.Url = YT_FullUrl(*t.StateCurr.Element.MustElement("#main-link").MustAttribute("href"))
-		ezlog.Debug().N(prefix).M(info.String()).Out()
+		TraceElement(ezlog.TRACE, prefix, "", t.StateCurr.Element)
 		t.StateCurr.ElementInfo = &info
 	}
 }

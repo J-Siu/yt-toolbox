@@ -27,7 +27,6 @@ import (
 	"github.com/J-Siu/go-helper/v2/str"
 	"github.com/J-Siu/go-is/v3/is"
 	"github.com/runZeroInc/go-rod"
-	"github.com/yosssi/gohtml"
 )
 
 type IsPlaylist struct {
@@ -77,9 +76,7 @@ func (t *IsPlaylist) override_V010_Container() {
 	t.StateCurr.Name = prefix
 	byId := "#contents"
 	t.Container = t.Page.MustElement(byId) // by id
-	if ezlog.GetLogLevel() == ezlog.TRACE {
-		ezlog.Trace().N(prefix).M(byId).Lm(gohtml.Format(t.Container.MustHTML())).Out()
-	}
+	TraceElement(ezlog.TRACE, prefix, "", t.Container)
 }
 
 func (t *IsPlaylist) override_V020_Elements() {
@@ -95,9 +92,7 @@ func (t *IsPlaylist) override_V030_ElementInfo() {
 	t.StateCurr.Name = prefix
 	if t.StateCurr.Element != nil {
 		var info YT_Info
-		if ezlog.GetLogLevel() == ezlog.TRACE {
-			ezlog.Trace().N(prefix).N("element").Lm(gohtml.Format(t.StateCurr.Element.MustHTML())).Out()
-		}
+		TraceElement(ezlog.TRACE, prefix, "", t.StateCurr.Element)
 		h3 := t.StateCurr.Element.MustElement("h3")
 		if h3 != nil {
 			info.Title = *(h3.MustAttribute("title"))
@@ -107,9 +102,7 @@ func (t *IsPlaylist) override_V030_ElementInfo() {
 		es := t.StateCurr.Element.MustElements(tagName)
 		for _, s := range es {
 			if s.MustText() == "View full playlist" {
-				if ezlog.GetLogLevel() == ezlog.TRACE {
-					ezlog.Trace().N(prefix).N(tagName).Lm(gohtml.Format(s.MustHTML())).Out()
-				}
+				TraceElement(ezlog.TRACE, prefix, "", s)
 				info.Url = YT_FullUrl(*s.MustAttribute("href"))
 			}
 		}

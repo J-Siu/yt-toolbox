@@ -64,19 +64,22 @@ func GetTab(host string, port int) (page *rod.Page) {
 }
 
 // log at trace level, format element html
-func TraceElement(prefix, tag string, e *rod.Element) {
-	ezlog.Trace()
-	if len(prefix) > 0 {
-		ezlog.N(prefix)
+func TraceElement(level ezlog.EzLogLevel, prefix, tag string, e *rod.Element) {
+	if ezlog.GetLogLevel() >= level {
+		ezlog.LogL(level)
+		ezlog.Trace()
+		if len(prefix) > 0 {
+			ezlog.N(prefix)
+		}
+		if len(tag) > 0 {
+			ezlog.N(tag)
+		}
+		ezlog.Lm(e)
+		if e != nil {
+			ezlog.Lm(gohtml.Format(e.MustHTML()))
+		}
+		ezlog.Out()
 	}
-	if len(tag) > 0 {
-		ezlog.N(tag)
-	}
-	ezlog.Lm(e)
-	if e != nil {
-		ezlog.Lm(gohtml.Format(e.MustHTML()))
-	}
-	ezlog.Out()
 }
 
 func UrlDecode(urlIn string) (urlOut string) {
